@@ -1,0 +1,27 @@
+led : 17
+device_id : 'b42-pi01'
+test : True
+user : 'logger'
+password : 'logger'
+host : 'localhost'
+port : 3306
+database : 'smartlab'
+client_id_pub : 'b42-pub-pi01'
+client_id_sub : 'b42-sub-pi01'
+measure_interval : 2
+
+BROKER_HOST : "localhost"
+
+KEEPALIVE_SECONDS : 60
+BROKER_PORT : 1883
+BROKER_PORT_LOCAL : 1883
+
+TOPICS :
+  "temperature": "ahuntsic/aec-iot/b42/pi01/sensors/temperature"
+  "temperature_brut": "ahuntsic/aec-iot/b42/pi01/sensors/temperature/value"
+  "presence": "ahuntsic/aec-iot/b42/pi01/status/online"
+  "led_status": "ahuntsic/aec-iot/b42/pi01/actuators/led/state"
+  "led_command": "ahuntsic/aec-iot/b42/droid01/actuators/led/cmd"
+  "other" : "ahuntsic/aec-iot/b42/other"
+
+

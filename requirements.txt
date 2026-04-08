@@ -1,0 +1,6 @@
+gpiozero~=2.0.1
+rpi.GPIO
+Mock.GPIO
+pyyaml
+paho-mqtt
+pymysql
