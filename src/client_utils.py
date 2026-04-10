@@ -5,6 +5,8 @@ def classify_kind(topic: str) -> str:
     """
     Classe l'événement selon le topic.
     """
+    if "/nuit-cmd" in topic:
+        return "nuit"
     if "/led/cmd" in topic:
         return "cmd"
     if "/state" in topic:
@@ -13,8 +15,6 @@ def classify_kind(topic: str) -> str:
         return "status" # presence
     if "etat" in topic:
         return "etat"
-    if "/nuit/cmd" in topic:
-        return "nuit"
     if "cling" in topic:
         return "cling"
 
