@@ -78,13 +78,15 @@ def on_message(client, userdata, msg):
         else:
             state = "ERROR"
         payload = {"state": cmd}
-        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_command"])
+        client.publish(config["TOPICS"]["led_status"], json.dumps(payload), qos=1, retain=True)
+
         payload = {
             "device": config["device_id"],
             "actuator": f"led-{config['led']}",
             "state": f"{state}",
             "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-        client.publish(config["TOPICS"]["led_status"], json.dumps(payload), qos=1, retain=True)
+        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_command"])
+
     elif classification == "state":
         db_utils.insert_event(payload, topic=config["TOPICS"]["led_status"])
     elif classification == "status":
@@ -103,13 +105,14 @@ def on_message(client, userdata, msg):
         else:
             state = "ERROR"
         payload = {"state": cmd}
-        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["mode_nuit"])
+        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
         payload = {
             "device": config["device_id"],
             "actuator": f"mode_nuit",
             "state": f"{state}",
             "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["mode_nuit"])
+
     elif classification == "cling":
         led.led_blink()
         if not led.blink_state:
@@ -118,13 +121,15 @@ def on_message(client, userdata, msg):
             cmd = "blink on"
         print(f"cling {cmd}")
         payload = {cmd}
-        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_status"])
+        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+
         payload = {
             "device": config["device_id"],
             "actuator": f"mode_nuit",
             "state": f"{cmd}",
             "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_status"])
+
 
     else:
         if msg.topic == config['TOPICS']['temperature']:
