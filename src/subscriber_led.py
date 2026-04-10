@@ -65,8 +65,6 @@ def on_message(client, userdata, msg):
     if client_utils.is_telemetry(msg.topic):
         db_utils.insert_measurement(payload, topic=msg.topic)
     cmd = payload.strip().upper()
-    if cmd not in ["ON", "OFF"]:
-        raise ValueError("state must be ON or OFF")
     print(f"[CMD] {payload}")
     if classification == "cmd":
         if cmd in ["ON"]:
@@ -94,11 +92,11 @@ def on_message(client, userdata, msg):
     elif classification == "etat":
         db_utils.insert_event(payload, topic=config["TOPICS"]["etat"])
     elif classification == "nuit":
-        if cmd in ["ON"]:
+        if cmd == "ON":
             mode_nuit.led_on()
             print("led on")
             state = "ON"
-        elif cmd in ["OFF"]:
+        elif cmd == "OFF":
             mode_nuit.led_off()
             print("led off")
             state = "OFF"
