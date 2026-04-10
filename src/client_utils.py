@@ -11,6 +11,13 @@ def classify_kind(topic: str) -> str:
         return "state" # led state
     if "/status/" in topic:
         return "status" # presence
+    if "etat" in topic:
+        return "etat"
+    if "nuit" in topic:
+        return "nuit"
+    if "cling" in topic:
+        return "cling"
+
     return "other"
 
 def is_telemetry(topic: str) -> bool:

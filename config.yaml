@@ -1,4 +1,5 @@
 led : 17
+led_mode_nuit : 22
 device_id : 'b42-pi01'
 test : True
 user : 'logger'
@@ -8,6 +9,9 @@ port : 3306
 database : 'smartlab'
 client_id_pub : 'b42-pub-pi01'
 client_id_sub : 'b42-sub-pi01'
+client_id_droid : 'b42-droid-pi01'
+client_id_pub_voix: 'b42-pub-voix-pi01'
+client_id_sub_voix: 'b42-sub-voix-pi01'
 measure_interval : 2
 
 BROKER_HOST : "localhost"
@@ -20,6 +24,9 @@ TOPICS :
   "temperature": "ahuntsic/aec-iot/b42/pi01/sensors/temperature"
   "temperature_brut": "ahuntsic/aec-iot/b42/pi01/sensors/temperature/value"
   "presence": "ahuntsic/aec-iot/b42/pi01/status/online"
+  "presence_voix": "ahuntsic/aec-iot/b42/pi01/status/mic"
+  "mode_nuit": "ahuntsic/aec-iot/b42/pi01/actuators/mode_nuit/cmd"
+  "mode_nuit_status": "ahuntsic/aec-iot/b42/pi01/actuators/mode_nuit/state"
   "led_status": "ahuntsic/aec-iot/b42/pi01/actuators/led/state"
   "led_command": "ahuntsic/aec-iot/b42/droid01/actuators/led/cmd"
   "other" : "ahuntsic/aec-iot/b42/other"

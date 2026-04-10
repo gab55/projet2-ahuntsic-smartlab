@@ -6,21 +6,17 @@ import json
 import sys
 import os
 from datetime import datetime, timezone
-import time
-
+import main_utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import db.db_utils as db_utils
 import paho.mqtt.client as mqtt
 import signal
-import yaml
 import gpio
 import client_utils
+config = main_utils.get_config()
 
-with open("config.yaml", 'r') as file:
-    config = yaml.safe_load(file)
-    if config is None:
-        raise ValueError("config.yaml is empty")
-
+led = gpio.Led(config['led'])
+mode_nuit = gpio.Led(config['led_mode_nuit'])
 
 
 def on_connect(client, userdata, flags, reason_code, properties=None):
@@ -31,8 +27,30 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         client.subscribe(config["TOPICS"]["presence"], qos=1)
         client.subscribe(config["TOPICS"]["led_status"], qos=1)
         client.subscribe(config["TOPICS"]["temperature"], qos=0)
+        client.subscribe(config["TOPICS"]["other"], qos=0)
+        client.subscribe(config["TOPICS"]["presence_voix"], qos=1)
+        client.subscribe(config["TOPICS"]["mode_nuit"], qos=1)
+        client.subscribe(config["TOPICS"]["command_voix"], qos=1)
+
     else:
         print("[ERROR] Connexion refusée ou échouée. Verifier Mosquitto, host, port, auth.")
+
+
+# def command(payload, led, cmd):
+#     print(f"[CMD] {payload}")
+#     if cmd not in ["ON", "OFF"]:
+#         raise ValueError("state must be ON or OFF")
+#     elif cmd in ["ON"]:
+#         led.led_on()
+#         print("led on")
+#         return "ON"
+#     elif cmd in ["OFF"]:
+#         led.led_off()
+#         print("led off")
+#         return "OFF"
+#     else:
+#         return "ERROR"
+
 
 
 def on_message(client, userdata, msg):
@@ -46,17 +64,17 @@ def on_message(client, userdata, msg):
         f"payload={payload}")
     if client_utils.is_telemetry(msg.topic):
         db_utils.insert_measurement(payload, topic=msg.topic)
+    cmd = payload.strip().upper()
+    if cmd not in ["ON", "OFF"]:
+        raise ValueError("state must be ON or OFF")
+    print(f"[CMD] {payload}")
     if classification == "cmd":
-        cmd = payload.strip().upper()
-        print(f"[CMD] {payload}")
-        if cmd not in ["ON", "OFF"]:
-            raise ValueError("state must be ON or OFF")
-        elif cmd in ["ON"]:
-            gpio.led_on()
+        if cmd in ["ON"]:
+            led.led_on()
             print("led on")
             state = "ON"
         elif cmd in ["OFF"]:
-            gpio.led_off()
+            led.led_off()
             print("led off")
             state = "OFF"
         else:
@@ -73,6 +91,43 @@ def on_message(client, userdata, msg):
         db_utils.insert_event(payload, topic=config["TOPICS"]["led_status"])
     elif classification == "status":
         db_utils.insert_event(payload, topic=config["TOPICS"]["presence"])
+    elif classification == "etat":
+        db_utils.insert_event(payload, topic=config["TOPICS"]["etat"])
+    elif classification == "nuit":
+        if cmd in ["ON"]:
+            mode_nuit.led_on()
+            print("led on")
+            state = "ON"
+        elif cmd in ["OFF"]:
+            mode_nuit.led_off()
+            print("led off")
+            state = "OFF"
+        else:
+            state = "ERROR"
+        payload = {"state": cmd}
+        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["mode_nuit"])
+        payload = {
+            "device": config["device_id"],
+            "actuator": f"mode_nuit",
+            "state": f"{state}",
+            "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
+        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+    elif classification == "cling":
+        led.led_blink()
+        if not led.blink_state:
+            cmd = "blink off"
+        else:
+            cmd = "blink on"
+        print(f"cling {cmd}")
+        payload = {cmd}
+        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_status"])
+        payload = {
+            "device": config["device_id"],
+            "actuator": f"mode_nuit",
+            "state": f"{cmd}",
+            "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
+        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+
     else:
         if msg.topic == config['TOPICS']['temperature']:
             return

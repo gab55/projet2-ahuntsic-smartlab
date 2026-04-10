@@ -4,17 +4,9 @@
 import json
 import signal
 import subprocess
-
-import yaml
-
-with open("config.yaml", 'r') as file:
-    config = yaml.safe_load(file)
-    if config is None:
-        raise ValueError("config.yaml is empty")
-
+import main_utils
+config = main_utils.get_config()
 import db.db_utils as db_utils
-
-
 
 def requirements():
     """
@@ -45,6 +37,13 @@ def main():
         "src/subscriber_led.py"])
 
     print("subscriber_led started")
+
+    voices_process = subprocess.Popen([
+        "python3",
+        "src/publisher_voix.py"
+    ])
+
+    print("publisher_voix started")
     try:
         while True:
             pass
@@ -54,10 +53,14 @@ def main():
         publisher_process.send_signal(signal.SIGINT)
         publisher_process.wait(timeout=5)
 
+        voices_process.send_signal(signal.SIGINT)
+        voices_process.wait(timeout=5)
+
 
         subscriber_process.send_signal(signal.SIGINT)
         subscriber_process.wait(timeout=5)
         db_utils.insert_event(json.dumps({"presence" : "offline"}), topic=config["TOPICS"]["presence"])
+        db_utils.insert_event(json.dumps({"presence" : "offline"}), topic=config["TOPICS"]["presence_voix"])
 
 if __name__ == "__main__":
     db_utils.db_create()

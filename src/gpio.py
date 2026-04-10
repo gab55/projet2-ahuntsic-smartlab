@@ -1,9 +1,11 @@
 import time
-import yaml
 
+import led
+import yaml
+import main_utils
 try:
     import RPi.GPIO as GPIO
-    from gpiozero import CPUTemperature
+    from gpiozero import CPUTemperature, LED
     mock = False
     print("GPIO Init OK")
 except ImportError:
@@ -14,38 +16,79 @@ except ImportError:
 
 GPIO.setmode(GPIO.BCM)
 
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+config = main_utils.get_config()
 
 def gpio_init():
+    """
+    initialise les GPIO entre un GPIO ou un GPIO simule
+
+    """
     if mock:
         return None
     else:
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(config['led'], GPIO.OUT)
-
-def led_on():
-    """
-    Allume le LED
-    :return: None
-    """
-    if mock:
-        print("Mock led on")
-    else:
-        GPIO.output(config['led'], GPIO.HIGH)
+        return None
 
 
-def led_off():
-    """
-    Ferme le LED et nettoie les ressources
-    :return: None
-    """
-    if mock:
-        print("Mock led off")
-    else:
-        GPIO.output(config['led'], GPIO.LOW)
+class Led:
+    def __init__(self, pin):
+        self.blink_state = False
+        self.pin = pin
+        self.state = False
+        GPIO.setup(pin, GPIO.OUT)
+        self.led = LED(self.pin)
+
+    def led_on(self):
+        """
+        Allume le LED
+        :return: None
+        """
+        if mock:
+            print("Mock led on")
+        else:
+            if self._blink_state:
+                self.led_blink()
+            GPIO.output(self.pin, GPIO.HIGH)
+            self.state = True
+
+
+    def led_off(self):
+        """
+        Ferme le LED et nettoie les ressources
+        :return: None
+        """
+        if mock:
+            print("Mock led off")
+        else:
+            if self._blink_state:
+                self.led_blink()
+            GPIO.output(self.pin, GPIO.LOW)
+            self.state = False
+
+    def led_toggle(self):
+        if self.state:
+            self.led_off()
+        else:
+            self.led_on()
+        return self.state
+
+    def led_blink(self, duration=0.5):
+        self.blink_state = not self.blink_state
+        if mock:
+            print("Mock led blink")
+        else:
+            if self.blink_state:
+                self.led.blink(on_time=duration/2, off_time=duration/2)
+            else:
+                self.led.led_off()
+
+
+
 
 def led_exit():
+    """
+    cleanups GPIO resources
+    """
     if not mock:
         try:
             GPIO.cleanup()
@@ -55,7 +98,7 @@ def led_exit():
 def cpu_temp():
     """
     Donne la temperature du CPU en Celsius
-    :return: CPU temperature or randint(10, 30) when mock
+    :return: CPU temperature in C or randint(10, 30) when mock
     """
     if mock:
         return randint(10, 30)
@@ -64,8 +107,8 @@ def cpu_temp():
 
 def cpu_value():
     """
-    Donne la temperature du CPU en Celsius
-    :return: CPU temperature or randint(10, 30) when mock
+    Donne la temperature du CPU en value
+    :return: CPU temperature value or randint(10, 30) when mock
     """
     if mock:
         return randint(10, 30)

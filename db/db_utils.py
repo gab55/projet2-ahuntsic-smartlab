@@ -7,13 +7,14 @@ import yaml
 import os
 from src.client_utils import parse_json
 
-with open('config.yaml', 'r') as file:
-    config = yaml.load(file, Loader=yaml.FullLoader)
+# with open('config.yaml', 'r') as file:
+#     config = yaml.load(file, Loader=yaml.FullLoader)
 
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import src.client_utils as client_utils
-
+import main_utils
+config = main_utils.get_config()
 
 test = config['test']
 user = config['user']
@@ -22,6 +23,8 @@ host = config['host']
 port = config['port']
 database = config['database']
 
+schema = main_utils.abs_path("schema.sql", "db")
+queries = main_utils.abs_path("queries.sql", "db")
 def db_create():
     """
     create database and tables if not exists
@@ -35,7 +38,7 @@ def db_create():
             port=port
         )
         cursor = conn.cursor()
-        with open('db/schema.sql', 'r') as f:
+        with open(schema, 'r') as f:
             create = f.read()
         statements = [stmt.strip() for stmt in create.split(';') if stmt.strip()]
 
@@ -159,7 +162,7 @@ def db_query(query=0):
     :return:
     """
     conn, cursor = db_conn()
-    with open('db/queries.sql', 'r') as f:
+    with open(queries, 'r') as f:
         sql_content = f.read()
 
     queries = [query.strip() for query in sql_content.split(';') if query.strip()]

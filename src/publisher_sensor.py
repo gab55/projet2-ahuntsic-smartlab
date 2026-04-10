@@ -5,19 +5,14 @@
 import json
 import time
 import sys
-import os
 from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
-import yaml
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import main_utils
 import db.db_utils as db_utils
 from gpio import cpu_temp
 import client_utils
 
-with open('config.yaml') as file:
-    config = yaml.safe_load(file)
-    if config is None:
-        raise ValueError("config.yaml is empty")
+config = main_utils.get_config()
 
 # Configuration Settings
 

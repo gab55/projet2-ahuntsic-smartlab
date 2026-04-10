@@ -3,7 +3,7 @@ import os
 from unittest import result
 import sys
 import yaml
-with open("config.yaml", 'r') as ymlfile:
+with open("../config.yaml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
 line = ""
 for i in range(20):
