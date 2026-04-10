@@ -127,24 +127,30 @@ def categorise_command(tokens: list):
     if any(item in tokens for item in ["mode", "nuit"]):
         if cmd == "ON":
             respond("nuit_on")
+            print("mode nuit on")
         elif cmd == "OFF":
             respond("nuit_off")
+            print("mode nuit off")
         return config["topic"]["nuit"], cmd
 
     if "clignote" in tokens:
         if cmd == "ON" or cmd == "error":
             cmd = "ON"
             respond("cling")
+            print("clignote")
         return config["topic"]["cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
         if cmd == "ON":
             respond("ON")
+            print("allume la lampe")
         elif cmd == "OFF":
             respond("OFF")
+            print("eteint la lampe")
         return config["topic"]["led_command"], cmd
 
     respond("error")
+    print("je ne comprends pas")
     return config["topic"]["error"] , "object"
 
 def wait_for_command():
