@@ -213,7 +213,6 @@ client = mqtt.Client(
 
 
 
-signal.signal(signal.SIGINT, signal_handler)
 client.username_pw_set(username=config["user"], password=config["password"])
 client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["KEEPALIVE_SECONDS"])
 
