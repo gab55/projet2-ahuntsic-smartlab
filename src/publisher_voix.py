@@ -220,8 +220,8 @@ client.will_set(
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
         print("[INFO] Voix Connected")
-        client.subscribe(config["TOPICS"]["mode_nuit"], qos=1)
-        client.subscribe(config["TOPICS"]["led_status"], qos=1)
+        client.subscribe(config["TOPICS"]["mode_nuit_status"], qos=1)
+        # client.subscribe(config["TOPICS"]["led_status"], qos=1)
 
     else:
         print(f"[ERROR] Voix Connection failed with code {rc}")
