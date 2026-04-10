@@ -206,7 +206,7 @@ def respond(category, text=""):
 
 
 client = mqtt.Client(
-    client_id=config["client_id_pub_voix"],
+    client_id=config["client_id_vox"],
     callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
 client.username_pw_set(username=config["user"], password=config["password"])
 
