@@ -2,6 +2,7 @@ import json
 import os
 import platform
 import random
+import signal
 import subprocess
 import sys
 import time
@@ -164,6 +165,7 @@ def listen_loop():
         if wait_for_hotword():
             command = wait_for_command()
             if command is not None:
+                print(f"[MSG] {command}")
                 return command
 
 system_name = platform.system().lower()
@@ -208,7 +210,12 @@ def respond(category, text=""):
 client = mqtt.Client(
     client_id=config["client_id_vox"],
     callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
+
+
+
+signal.signal(signal.SIGINT, signal_handler)
 client.username_pw_set(username=config["user"], password=config["password"])
+client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["KEEPALIVE_SECONDS"])
 
 client.will_set(
     topic=config["TOPICS"]["presence_voix"],
@@ -248,10 +255,10 @@ def on_message(client, userdata, msg):
             mode_nuit_status = False
 
 
+
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect
-
-client.connect(host=config["BROKER_HOST"], port=config["BROKER_PORT_LOCAL"], keepalive=config["KEEPALIVE_SECONDS"])
+client.on_message = on_message
 
 client.loop_start()
 

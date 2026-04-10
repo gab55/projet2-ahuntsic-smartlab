@@ -75,7 +75,7 @@ try:
         time.sleep(config["measure_interval"])
 
 except KeyboardInterrupt:
-    print("\n[STOP] arrêt demande")
+    print("\n[STOP] publisher arrêt demande")
 finally:
     try:
         result = client.publish(
