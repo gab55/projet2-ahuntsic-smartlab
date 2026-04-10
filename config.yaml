@@ -10,8 +10,7 @@ database : 'smartlab'
 client_id_pub : 'b42-pub-pi01'
 client_id_sub : 'b42-sub-pi01'
 client_id_droid : 'b42-droid-pi01'
-client_id_pub_voix: 'b42-pub-voix-pi01'
-client_id_sub_voix: 'b42-sub-voix-pi01'
+client_id_vox: 'b42-voix-pi01'
 measure_interval : 2
 
 BROKER_HOST : "localhost"
