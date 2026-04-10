@@ -97,9 +97,9 @@ def listen(timeout=5):
 
 def wait_for_hotword():
     tokens = listen()
-    if tokens is None:
+    if tokens is False:
         return None
-    if any(item in tokens for item in ["raspi", "raspberry", "pi"]):
+    if "pi" in tokens:
             print("Hotword detected")
             return True
     return None
@@ -167,8 +167,6 @@ def listen_loop():
             if command is not None:
                 print(f"[MSG] {command}")
                 return command
-        else:
-            time.sleep(0.1)
 
 system_name = platform.system().lower()
 
