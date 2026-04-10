@@ -204,6 +204,12 @@ def respond(category, text=""):
     else:
         play(random.choice(rec_liste["error"]))
 
+
+
+client = mqtt.Client(
+    client_id=config["client_id_vox"],
+    callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
+
 client.will_set(
     topic=config["TOPICS"]["presence_voix"],
     payload=json.dumps({"presence" : "offline"}),
@@ -242,9 +248,6 @@ def on_message(client, userdata, msg):
             mode_nuit_status = False
 
 
-client = mqtt.Client(
-    client_id=config["client_id_vox"],
-    callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
 
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect
