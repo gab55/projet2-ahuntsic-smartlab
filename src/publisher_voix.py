@@ -72,19 +72,21 @@ def listen(timeout=5):
     r.dynamic_energy_threshold = False
     r.energy_threshold = 10000
     r.pause_threshold = 1
-
+    if mic is None:
+        print("Microphone not found")
+        return "error"
     with mic as source:
         print("ajustement de l'environnement")
         r.adjust_for_ambient_noise(source, duration=1)
         print("seuil energie calibre = ", r.energy_threshold)
         print("parlez maintenant....")
         while True:
-
             try:
-                audio = r.listen(source, timeout=timeout, phrase_time_limit=5)
+                audio = r.listen(source, timeout=timeout, phrase_time_limit=6)
             except sr.WaitTimeoutError:
                 print("Timeout")
-                continue
+
+
             try:
                 text = r.recognize_google(audio, language="fr-FR")
                 print(f"Vous avez dit : {text}")
@@ -92,17 +94,19 @@ def listen(timeout=5):
 
             except sr.UnknownValueError:
                 print("Google Speech Recognition could not understand audio")
+                return "error"
             except sr.RequestError as e:
                 print(f"Could not request results from Google Speech Recognition service; {e}")
+                return None
 
 def wait_for_hotword():
     tokens = listen()
     if tokens is False:
         return None
-    if "pi" in tokens:
+    if any(item in tokens for item in ["pi", "raspi"]):
             print("Hotword detected")
             return True
-    return None
+    return False
 
 def categorise_command(tokens: list):
     if not tokens:
@@ -200,18 +204,9 @@ def respond(category, text=""):
     else:
         play(random.choice(rec_liste["error"]))
 
-# def cache_audio():
-#     """
-#     pour cacher les fichiers audio avec le text propre
-#     """
-#     return
-
-
 client = mqtt.Client(
     client_id=config["client_id_vox"],
     callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
-
-
 
 client.username_pw_set(username=config["user"], password=config["password"])
 client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["KEEPALIVE_SECONDS"])
