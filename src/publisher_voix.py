@@ -167,6 +167,8 @@ def listen_loop():
             if command is not None:
                 print(f"[MSG] {command}")
                 return command
+        else:
+            time.sleep(0.1)
 
 system_name = platform.system().lower()
 
