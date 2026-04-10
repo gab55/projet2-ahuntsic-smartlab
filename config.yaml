@@ -24,7 +24,7 @@ TOPICS :
   "temperature_brut": "ahuntsic/aec-iot/b42/pi01/sensors/temperature/value"
   "presence": "ahuntsic/aec-iot/b42/pi01/status/online"
   "presence_voix": "ahuntsic/aec-iot/b42/pi01/status/mic"
-  "mode_nuit": "ahuntsic/aec-iot/b42/pi01/actuators/nuit-cmd"
+  "mode_nuit": "ahuntsic/aec-iot/b42/pi01/actuators/nuit/cmd"
   "mode_nuit_status": "ahuntsic/aec-iot/b42/pi01/actuators/nuit/state"
   "led_status": "ahuntsic/aec-iot/b42/pi01/actuators/led/state"
   "led_command": "ahuntsic/aec-iot/b42/droid01/actuators/led/cmd"
