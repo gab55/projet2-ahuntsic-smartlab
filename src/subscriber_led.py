@@ -31,7 +31,6 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         client.subscribe(config["TOPICS"]["other"], qos=0)
         client.subscribe(config["TOPICS"]["presence_voix"], qos=1)
         client.subscribe(config["TOPICS"]["mode_nuit"], qos=1)
-        client.subscribe(config["TOPICS"]["command_voix"], qos=1)
 
     else:
         print("[ERROR] Connexion refusée ou échouée. Verifier Mosquitto, host, port, auth.")
