@@ -204,13 +204,6 @@ def respond(category, text=""):
     else:
         play(random.choice(rec_liste["error"]))
 
-client = mqtt.Client(
-    client_id=config["client_id_vox"],
-    callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
-
-client.username_pw_set(username=config["user"], password=config["password"])
-client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["KEEPALIVE_SECONDS"])
-
 client.will_set(
     topic=config["TOPICS"]["presence_voix"],
     payload=json.dumps({"presence" : "offline"}),
@@ -249,10 +242,19 @@ def on_message(client, userdata, msg):
             mode_nuit_status = False
 
 
+client = mqtt.Client(
+    client_id=config["client_id_vox"],
+    callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
 
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect
 client.on_message = on_message
+client.username_pw_set(username=config["user"], password=config["password"])
+client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["KEEPALIVE_SECONDS"])
+
+print("[INFO] Connected")
+print("[INFO] Waiting for messages")
+
 
 client.loop_start()
 

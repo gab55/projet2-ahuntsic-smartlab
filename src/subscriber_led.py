@@ -36,6 +36,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         print("[ERROR] Connexion refusée ou échouée. Verifier Mosquitto, host, port, auth.")
 
 
+
 # def command(payload, led, cmd):
 #     print(f"[CMD] {payload}")
 #     if cmd not in ["ON", "OFF"]:
