@@ -3,10 +3,12 @@
 # conecte au broker
 # publish
 import json
+import os
 import time
 import sys
 from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import main_utils
 import db.db_utils as db_utils
 from gpio import cpu_temp

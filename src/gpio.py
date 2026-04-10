@@ -1,7 +1,4 @@
 import time
-
-import led
-import yaml
 import main_utils
 try:
     import RPi.GPIO as GPIO
@@ -117,16 +114,18 @@ def cpu_value():
 
 
 if __name__ == "__main__":
+    gpio_init()
+    led = Led(config["LED_PIN"])
     try:
         while True:
             try:
                 print(f'{time.strftime("%H:%M:%S")} la temperature est {cpu_temp()} °C', end=" ")
-                led_on()
+                led.led_on()
                 time.sleep(1)
             finally:
                 print(f'{time.strftime("%H:%M:%S")} la temperature est {cpu_temp()} °C', end=" ")
-                led_off()
+                led.led_off()
                 time.sleep(1)
     finally:
-        led_off()
+        led.led_off()
 

@@ -6,6 +6,7 @@ import json
 import sys
 import os
 from datetime import datetime, timezone
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import main_utils
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import db.db_utils as db_utils

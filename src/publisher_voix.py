@@ -14,6 +14,7 @@ import paho.mqtt.client as mqtt
 from joblib import Memory
 import client_utils
 import gpio
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import main_utils
 from db import db_utils
 mode_nuit_state = False

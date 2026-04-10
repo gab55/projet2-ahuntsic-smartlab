@@ -1,6 +1,11 @@
 gpiozero~=2.0.1
-rpi.GPIO
+RPi.GPIO
 Mock.GPIO
-pyyaml
+PyYAML
 paho-mqtt
 pymysql
+SpeechRecognition
+joblib
+french_lefff_lemmatizer
+
+git+https://github.com/ClaudeCoulombe/FrenchLefffLemmatizer.git
