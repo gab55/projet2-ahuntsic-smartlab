@@ -13,6 +13,8 @@ import paho.mqtt.client as mqtt
 from joblib import Memory
 import client_utils
 import gpio
+from client_utils import classify_kind
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import main_utils
 from db import db_utils
@@ -162,15 +164,6 @@ def wait_for_command():
         return None
     return categorise_command(words)
 
-def listen_loop():
-    while True:
-        print("wait for hotword")
-        if wait_for_hotword():
-            print("wait for command")
-            command = wait_for_command()
-            if command is not None:
-                print(f"[MSG] {command}")
-                return command
 
 system_name = platform.system().lower()
 
@@ -273,7 +266,28 @@ result.wait_for_publish()
 
 try:
     while True:
-        topic, command = listen_loop()
+        try:
+            print("wait for hotword")
+            if wait_for_hotword():
+                print("hotword detected")
+                command = wait_for_command()
+                if command is not None:
+                    print(f"[MSG] {command}")
+                    topic, cmd = command
+                    payload = {classify_kind(topic): cmd}
+                    client.publish(
+                        topic=topic,
+                        payload=json.dumps(payload),  # dict Python -> string JSON
+                        qos=1,
+                        retain=False)
+                    # db_utils.insert_measurement(json.dumps(payload), topic=topic)
+                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+            else:
+                continue
+        except Exception as e:
+            print(f"[ERROR] {e}")
+            continue
+
         print(f"[MSG] {topic} -> {command}")
         # if topic is config["topic"]["led_command"]:
         payload = {command}
@@ -285,15 +299,6 @@ try:
         #         "ts": datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
 
         # Publication de la mesure
-        if command is not None:
-            client.publish(
-                topic=topic,
-                payload=json.dumps(payload),  # dict Python -> string JSON
-                qos=1,
-                retain=False)
-            # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-            print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
-
             # time.sleep(config["measure_interval"])
 
 except KeyboardInterrupt:
