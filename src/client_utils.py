@@ -40,8 +40,8 @@ def parse_json(json_str: str):
     except json.JSONDecodeError as e:
         return False
 
-def on_disconnect(client, userdata, reason_code, properties=None, *args):
-    print(f"[DISCONNECT] reason_code={reason_code}")
+def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None, *args):
+    print(f"[DISCONNECT] disconnect_flags: {disconnect_flags}  reason_code: {reason_code}")
     if reason_code != 0:
         reconnect(client)
 

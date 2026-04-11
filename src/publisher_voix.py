@@ -5,10 +5,8 @@ import random
 import signal
 import subprocess
 import sys
-import time
 import unicodedata
 import re
-from datetime import datetime, timezone
 from french_lefff_lemmatizer.french_lefff_lemmatizer import FrenchLefffLemmatizer
 import speech_recognition as sr
 import paho.mqtt.client as mqtt
