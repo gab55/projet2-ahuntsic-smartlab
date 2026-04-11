@@ -24,7 +24,7 @@ config = main_utils.get_config()
 BROKER_HOST = config["BROKER_HOST"]
 BROKER_PORT = config["BROKER_PORT_LOCAL"]
 MIC_INDEX = 1
-hotword = "raspi"
+hotword = "pi"
 topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
@@ -62,7 +62,7 @@ def voix_normalise(text):
     words = regex_pattern.findall(text.lower())
     return [cached_lemmantizer(word) for word in words if word not in stopwords]
 
-def listen(timeout=5):
+def listen(timeout=1):
     """
     wait for speech input
     return: list of normalized words
@@ -77,7 +77,7 @@ def listen(timeout=5):
         return "error"
     with mic as source:
         print("ajustement de l'environnement")
-        r.adjust_for_ambient_noise(source, duration=1)
+        r.adjust_for_ambient_noise(source, duration=0.3)
         print("seuil energie calibre = ", r.energy_threshold)
         print("parlez maintenant....")
         while True:
@@ -102,9 +102,9 @@ def listen(timeout=5):
 
 def wait_for_hotword():
     tokens = listen()
-    if tokens is False:
-        return None
-    if any(item in tokens for item in ["pi", "raspi"]):
+    if tokens is None or tokens == "error":
+        return False
+    if hotword in tokens:
             print("Hotword detected")
             return True
     return False
