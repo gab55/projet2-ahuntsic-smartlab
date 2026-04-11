@@ -28,7 +28,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
     if reason_code == 0:
         client.subscribe(config["TOPICS"]["led_command"], qos=1)
         client.subscribe(config["TOPICS"]["presence"], qos=1)
-        client.subscribe(config["TOPICS"]["led_status"], qos=1)
+        # client.subscribe(config["TOPICS"]["led_status"], qos=1)
         client.subscribe(config["TOPICS"]["temperature"], qos=0)
         client.subscribe(config["TOPICS"]["presence_voix"], qos=1)
         client.subscribe(config["TOPICS"]["mode_nuit"], qos=1)
