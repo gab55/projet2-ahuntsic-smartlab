@@ -7,5 +7,6 @@ pymysql
 SpeechRecognition
 joblib
 french_lefff_lemmatizer
+pyaudio
 
 git+https://github.com/ClaudeCoulombe/FrenchLefffLemmatizer.git

@@ -83,6 +83,7 @@ def listen(timeout=5):
         while True:
             try:
                 audio = r.listen(source, timeout=timeout, phrase_time_limit=6)
+                print("got audio")
             except sr.WaitTimeoutError:
                 print("Timeout")
 
