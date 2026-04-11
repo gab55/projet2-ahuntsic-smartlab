@@ -19,6 +19,8 @@ config = main_utils.get_config()
 led = gpio.Led(config['led'])
 mode_nuit = gpio.Led(config['led_mode_nuit'])
 
+client = mqtt.Client(client_id=config["client_id_sub"],
+                     callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 
 def on_connect(client, userdata, flags, reason_code, properties=None):
     print(f"[CONNECT] reason_code={reason_code}")
@@ -28,12 +30,12 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         client.subscribe(config["TOPICS"]["presence"], qos=1)
         client.subscribe(config["TOPICS"]["led_status"], qos=1)
         client.subscribe(config["TOPICS"]["temperature"], qos=0)
-        client.subscribe(config["TOPICS"]["other"], qos=0)
         client.subscribe(config["TOPICS"]["presence_voix"], qos=1)
         client.subscribe(config["TOPICS"]["mode_nuit"], qos=1)
 
     else:
         print("[ERROR] Connexion refusée ou échouée. Verifier Mosquitto, host, port, auth.")
+        exit(1)
 
 
 
@@ -146,9 +148,6 @@ def signal_handler(signal, frame):
 
 
 
-
-client = mqtt.Client(client_id=config["client_id_sub"],
-                     callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect
 client.on_message = on_message
