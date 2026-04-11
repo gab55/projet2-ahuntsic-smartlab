@@ -37,10 +37,6 @@ rec_liste = {
     "cling": ["./aiff/cling.aiff"],#"Je clignote la lampe"
     "error": ["./aiff/error.aiff", "./aiff/error2.aiff","./aiff/error3.aiff"]}#"Je ne comprends pas"# Veuillez repeter"#"Je n'ai pas compris"#"Répétez, s'il vous plaît"
 
-def detect_hotword(text):
-    if hotword in text:
-        return True
-    return None
 
 memory = Memory("cachedir", verbose=0)
 @memory.cache
@@ -72,9 +68,6 @@ def listen(timeout=1):
     r.dynamic_energy_threshold = False
     r.energy_threshold = 10000
     r.pause_threshold = 1
-    if mic is None:
-        print("Microphone not found")
-        return "error"
     with mic as source:
         print("ajustement de l'environnement")
         r.adjust_for_ambient_noise(source, duration=0.3)
@@ -83,19 +76,15 @@ def listen(timeout=1):
         while True:
             try:
                 audio = r.listen(source, timeout=timeout, phrase_time_limit=6)
-                print("got audio")
             except sr.WaitTimeoutError:
-                print("Timeout")
-
-
+                continue
             try:
                 text = r.recognize_google(audio, language="fr-FR")
                 print(f"Vous avez dit : {text}")
                 return voix_normalise(text)
 
             except sr.UnknownValueError:
-                print("Google Speech Recognition could not understand audio")
-                return "error"
+                continue
             except sr.RequestError as e:
                 print(f"Could not request results from Google Speech Recognition service; {e}")
                 return None
