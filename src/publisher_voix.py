@@ -66,7 +66,7 @@ def listen(timeout=1):
     mic = sr.Microphone(device_index=MIC_INDEX)
     r = sr.Recognizer()
     r.dynamic_energy_threshold = False
-    r.energy_threshold = 10000
+    r.energy_threshold = 300
     r.pause_threshold = 1
     with mic as source:
         print("ajustement de l'environnement")
