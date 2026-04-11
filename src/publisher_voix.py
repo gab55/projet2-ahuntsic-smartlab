@@ -24,7 +24,7 @@ config = main_utils.get_config()
 BROKER_HOST = config["BROKER_HOST"]
 BROKER_PORT = config["BROKER_PORT_LOCAL"]
 MIC_INDEX = 1
-hotword = "pi"
+hotword = "assistant"
 topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
