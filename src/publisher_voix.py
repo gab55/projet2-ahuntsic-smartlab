@@ -73,21 +73,20 @@ def listen(timeout=1):
         r.adjust_for_ambient_noise(source, duration=0.3)
         print("seuil energie calibre = ", r.energy_threshold)
         print("parlez maintenant....")
-        while True:
-            try:
-                audio = r.listen(source, timeout=timeout, phrase_time_limit=4)
-            except sr.WaitTimeoutError:
-                continue
-            try:
-                text = r.recognize_google(audio, language="fr-FR")
-                print(f"Vous avez dit : {text}")
-                return voix_normalise(text)
 
-            except sr.UnknownValueError:
-                continue
-            except sr.RequestError as e:
-                print(f"Could not request results from Google Speech Recognition service; {e}")
-                return None
+        try:
+            audio = r.listen(source, timeout=timeout, phrase_time_limit=4)
+        except sr.WaitTimeoutError:
+            return None
+        try:
+            text = r.recognize_google(audio, language="fr-FR")
+            print(f"Vous avez dit : {text}")
+            return voix_normalise(text)
+        except sr.UnknownValueError:
+            return None
+        except sr.RequestError as e:
+            print(f"Could not request results from Google Speech Recognition service; {e}")
+            return None
 
 def wait_for_hotword():
     tokens = listen()
@@ -243,86 +242,86 @@ client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["K
 print("[INFO] Connected")
 print("[INFO] Waiting for messages")
 
-#
-# client.loop_start()
-#
-#
-# result = client.publish(
-#     topic=config["TOPICS"]["presence_voix"],
-#     payload = json.dumps({"presence" : "online"}),
-#     qos=1,
-#     retain=True)
-#
-# result.wait_for_publish()
-#
-# try:
-#     while True:
-#         try:
-#             print("wait for hotword")
-#             if wait_for_hotword():
-#                 print("hotword detected")
-#                 command = wait_for_command()
-#                 if command is not None:
-#                     print(f"[MSG] {command}")
-#                     topic, cmd = command
-#                     payload = {classify_kind(topic): cmd}
-#                     client.publish(
-#                         topic=topic,
-#                         payload=json.dumps(payload),  # dict Python -> string JSON
-#                         qos=1,
-#                         retain=False)
-#                     # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-#                     print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
-#             else:
-#                 continue
-#         except Exception as e:
-#             print(f"[ERROR] {e}")
-#             continue
-#
-#         print(f"[MSG] {topic} -> {command}")
-#         # if topic is config["topic"]["led_command"]:
-#         payload = {command}
-#         # else:
-#         #     payload = {
-#         #         "device": config["device_id"],
-#         #         "sensor": "microphone",
-#         #         "value": command,  # valeur numerique
-#         #         "ts": datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-#
-#         # Publication de la mesure
-#             # time.sleep(config["measure_interval"])
-#
-# except KeyboardInterrupt:
-#     print("\n[STOP] arrêt demande")
-# finally:
-#     try:
-#         result = client.publish(
-#             topic=config["TOPICS"]["presence_voix"],
-#             payload=json.dumps({"presence": "offline"}),
-#             qos=1,
-#             retain=True,
-#         )
-#         result.wait_for_publish(timeout=5)
-#     finally:
-#         try:
-#             client.disconnect()
-#         except Exception:
-#             pass
-#         try:
-#             client.loop_stop()
-#         except KeyboardInterrupt:
-#             pass
-#         except Exception:
-#             pass
-#     sys.exit(0)
+
+client.loop_start()
 
 
-if __name__ == "__main__":
+result = client.publish(
+    topic=config["TOPICS"]["presence_voix"],
+    payload = json.dumps({"presence" : "online"}),
+    qos=1,
+    retain=True)
+
+result.wait_for_publish()
+
+try:
+    while True:
+        try:
+            print("wait for hotword")
+            if wait_for_hotword():
+                print("hotword detected")
+                command = wait_for_command()
+                if command is not None:
+                    print(f"[MSG] {command}")
+                    topic, cmd = command
+                    payload = {classify_kind(topic): cmd}
+                    client.publish(
+                        topic=topic,
+                        payload=json.dumps(payload),  # dict Python -> string JSON
+                        qos=1,
+                        retain=False)
+                    # db_utils.insert_measurement(json.dumps(payload), topic=topic)
+                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+            else:
+                continue
+        except Exception as e:
+            print(f"[ERROR] {e}")
+            continue
+
+        print(f"[MSG] {topic} -> {command}")
+        # if topic is config["topic"]["led_command"]:
+        payload = {command}
+        # else:
+        #     payload = {
+        #         "device": config["device_id"],
+        #         "sensor": "microphone",
+        #         "value": command,  # valeur numerique
+        #         "ts": datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
+
+        # Publication de la mesure
+            # time.sleep(config["measure_interval"])
+
+except KeyboardInterrupt:
+    print("\n[STOP] arrêt demande")
+finally:
+    try:
+        result = client.publish(
+            topic=config["TOPICS"]["presence_voix"],
+            payload=json.dumps({"presence": "offline"}),
+            qos=1,
+            retain=True,
+        )
+        result.wait_for_publish(timeout=5)
+    finally:
+        try:
+            client.disconnect()
+        except Exception:
+            pass
+        try:
+            client.loop_stop()
+        except KeyboardInterrupt:
+            pass
+        except Exception:
+            pass
+    sys.exit(0)
 
 
-    listen()
+# if __name__ == "__main__":
+#
+#
+#     listen()
 
 
     # voix_normalise("allume la lampe éteins la lampe fais clignoter la lampe donne-moi l’état active le mode nuit"))
 
-    respond("speak", "Bonjour, je suis la voix de ma maison")
+    # respond("speak", "Bonjour, je suis la voix de ma maison")
