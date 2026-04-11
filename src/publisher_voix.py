@@ -214,14 +214,15 @@ client.will_set(
     qos=1,
     retain=True)
 
-def on_connect(client, userdata, flags, rc, properties=None):
-    if rc == 0:
+def on_connect(client, userdata, flags, reason_code, properties=None):
+    print(f"[INFO] Voix Connected with result code {reason_code}")
+    if reason_code == 0:
         print("[INFO] Voix Connected")
         client.subscribe(config["TOPICS"]["mode_nuit_status"], qos=1)
         # client.subscribe(config["TOPICS"]["led_status"], qos=1)
 
     else:
-        print(f"[ERROR] Voix Connection failed with code {rc}")
+        print(f"[ERROR] Voix Connection failed with code {reason_code} {properties}")
         exit(1)
 
 
