@@ -164,7 +164,9 @@ def wait_for_command():
 
 def listen_loop():
     while True:
+        print("wait for hotword")
         if wait_for_hotword():
+            print("wait for command")
             command = wait_for_command()
             if command is not None:
                 print(f"[MSG] {command}")
@@ -271,7 +273,6 @@ result.wait_for_publish()
 
 try:
     while True:
-        print("attente de commande")
         topic, command = listen_loop()
         print(f"[MSG] {topic} -> {command}")
         # if topic is config["topic"]["led_command"]:
