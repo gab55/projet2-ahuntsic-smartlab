@@ -261,6 +261,7 @@ print("[INFO] Waiting for messages")
 
 client.loop_start()
 
+
 result = client.publish(
     topic=config["TOPICS"]["presence_voix"],
     payload = json.dumps({"presence" : "online"}),
