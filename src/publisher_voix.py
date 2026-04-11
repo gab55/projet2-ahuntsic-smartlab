@@ -271,7 +271,9 @@ result.wait_for_publish()
 
 try:
     while True:
+        print("attente de commande")
         topic, command = listen_loop()
+        print(f"[MSG] {topic} -> {command}")
         # if topic is config["topic"]["led_command"]:
         payload = {command}
         # else:
