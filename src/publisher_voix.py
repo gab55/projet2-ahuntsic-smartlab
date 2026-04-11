@@ -24,7 +24,7 @@ config = main_utils.get_config()
 BROKER_HOST = config["BROKER_HOST"]
 BROKER_PORT = config["BROKER_PORT_LOCAL"]
 MIC_INDEX = 1
-hotword = "assistant"
+hotword = "pi"
 topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
@@ -66,7 +66,7 @@ def listen(timeout=1):
     mic = sr.Microphone(device_index=MIC_INDEX)
     r = sr.Recognizer()
     r.dynamic_energy_threshold = False
-    r.energy_threshold = 150
+    r.energy_threshold = 300
     r.pause_threshold = 1
     with mic as source:
         print("ajustement de l'environnement")
@@ -79,6 +79,7 @@ def listen(timeout=1):
         except sr.WaitTimeoutError:
             return None
         try:
+            print("recogniser...")
             text = r.recognize_google(audio, language="fr-FR")
             print(f"Vous avez dit : {text}")
             return text
