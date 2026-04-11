@@ -208,7 +208,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
     if reason_code == 0:
         print("[INFO] Voix Connected")
         client.subscribe(config["TOPICS"]["mode_nuit_status"], qos=1)
-        client.subscribe(config["TOPICS"]["led_status"], qos=1)
+        # client.subscribe(config["TOPICS"]["led_status"], qos=1)
 
     else:
         print(f"[ERROR] Voix Connection failed with code {reason_code} {properties}")
