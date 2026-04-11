@@ -42,7 +42,7 @@ def parse_json(json_str: str):
 
 def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None, *args):
     print(f"[DISCONNECT] disconnect_flags: {disconnect_flags}  reason_code: {reason_code}")
-    if reason_code != 0:
+    if disconnect_flags.is_disconnect_packet_from_server:
         reconnect(client)
 
 def reconnect(client):
