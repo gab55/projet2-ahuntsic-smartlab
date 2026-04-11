@@ -81,7 +81,7 @@ def listen(timeout=1):
         try:
             text = r.recognize_google(audio, language="fr-FR")
             print(f"Vous avez dit : {text}")
-            return voix_normalise(text)
+            return text
         except sr.UnknownValueError:
             return None
         except sr.RequestError as e:
@@ -89,10 +89,12 @@ def listen(timeout=1):
             return None
 
 def wait_for_hotword():
-    tokens = listen()
-    if tokens is None or tokens == "error":
+    text = listen()
+    tokens = voix_normalise(text)
+    if text is None or text == "error":
         return False
-    if hotword in tokens:
+    print(f"hotword detection: {text}")
+    if hotword in text.lower() or any(hotword in token for token in tokens):
             print("Hotword detected")
             return True
     print("Hotword not detected")
@@ -150,7 +152,8 @@ def categorise_command(tokens: list):
 
 def wait_for_command():
     words = listen()
-    if words is None:
+    tokens = voix_normalise(words)
+    if tokens is None:
         return None
     return categorise_command(words)
 
