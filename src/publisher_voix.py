@@ -107,6 +107,7 @@ def wait_for_hotword():
     if hotword in tokens:
             print("Hotword detected")
             return True
+    print("Hotword not detected")
     return False
 
 def categorise_command(tokens: list):
