@@ -66,7 +66,7 @@ def listen(timeout=1):
     mic = sr.Microphone(device_index=MIC_INDEX)
     r = sr.Recognizer()
     r.dynamic_energy_threshold = False
-    r.energy_threshold = 300
+    r.energy_threshold = 150
     r.pause_threshold = 1
     with mic as source:
         print("ajustement de l'environnement")
@@ -75,7 +75,7 @@ def listen(timeout=1):
         print("parlez maintenant....")
         while True:
             try:
-                audio = r.listen(source, timeout=timeout, phrase_time_limit=6)
+                audio = r.listen(source, timeout=timeout, phrase_time_limit=4)
             except sr.WaitTimeoutError:
                 continue
             try:
