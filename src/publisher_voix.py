@@ -319,11 +319,9 @@ print("[INFO] Waiting for messages")
 
 if __name__ == "__main__":
 
-    try:
-        while True:
-            listen()
-    except KeyboardInterrupt:
-        print("loop end")
+
+    listen()
+
 
     # voix_normalise("allume la lampe éteins la lampe fais clignoter la lampe donne-moi l’état active le mode nuit"))
 
