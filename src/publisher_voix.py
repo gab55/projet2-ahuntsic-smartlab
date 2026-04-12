@@ -180,7 +180,7 @@ def play(file):
         subprocess.run(["afplay", file_path])
     else:
         try:
-            subprocess.run(["aplay", file_path])
+            subprocess.run(["ffplay", "-nodisp", "-autoexit", file_path])
         except FileNotFoundError:
             print("aplay not found")
 
@@ -261,7 +261,7 @@ try:
             print("wait for hotword")
             if wait_for_hotword():
                 print("hotword detected")
-                respond("none", text="Bonjour, je suis la voix de ma maison")
+                respond("ecoute")
                 topic, command = wait_for_command()
                 if command is not None:
                     print(f"[MSG] topic: {topic} command: {command}")
