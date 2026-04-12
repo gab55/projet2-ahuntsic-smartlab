@@ -330,7 +330,7 @@ try:
                         qos=1,
                         retain=False)
                     # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+                    # print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
             else:
                 continue
         except Exception as e:

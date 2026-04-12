@@ -101,7 +101,7 @@ def handle_mode_nuit(client, data, payload):
             mode_nuit.led_on()
             print("led on")
             state = "ON"
-        elif cmd in ["OFF"]:
+        elif cmd == "OFF":
             mode_nuit.led_off()
             print("led off")
             state = "OFF"
@@ -119,7 +119,7 @@ def handle_led_command(client, data, payload):
             led.led_on()
             print("led on")
             state = "ON"
-        elif cmd in ["OFF"]:
+        elif cmd == "OFF":
             led.led_off()
             print("led off")
             state = "OFF"
