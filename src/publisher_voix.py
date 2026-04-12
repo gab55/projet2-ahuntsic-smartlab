@@ -91,6 +91,8 @@ def listen(timeout=1):
 
 def wait_for_hotword():
     text = listen()
+    if text is None:
+        return False
     tokens = voix_normalise(text)
     if text is None or text == "error":
         return False
@@ -153,8 +155,10 @@ def categorise_command(tokens: list):
     return config["topic"]["error"] , "error"
 
 def wait_for_command():
-    words = listen()
-    tokens = voix_normalise(words)
+    text = listen()
+    if text is None:
+        return None, None
+    tokens = voix_normalise(text)
     if tokens is None:
         return None
     topic, cmd = categorise_command(tokens)
@@ -207,8 +211,7 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
     if reason_code == 0:
         print("[INFO] Voix Connected")
         client.subscribe(config["TOPICS"]["mode_nuit_status"], qos=1)
-        # client.subscribe(config["TOPICS"]["led_status"], qos=1)
-
+        client.subscribe(config["TOPICS"]["led_status"], qos=1)
     else:
         print(f"[ERROR] Voix Connection failed with code {reason_code} {properties}")
         exit(1)
@@ -265,7 +268,7 @@ try:
                 print("hotword detected")
                 topic, command = wait_for_command()
                 if command is not None:
-                    print(f"[MSG] {command}")
+                    print(f"[MSG] topic: {topic} command: {command}")
                     if topic is not None:
                         payload = {classify_kind(topic): command}
                         client.publish(
