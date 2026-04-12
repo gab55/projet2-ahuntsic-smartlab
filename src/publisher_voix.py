@@ -6,6 +6,8 @@ import subprocess
 import sys
 import unicodedata
 import re
+from datetime import datetime, timezone
+
 from french_lefff_lemmatizer.french_lefff_lemmatizer import FrenchLefffLemmatizer
 import speech_recognition as sr
 import paho.mqtt.client as mqtt
@@ -114,6 +116,16 @@ def wait_for_hotword():
     print("[INFO] Hotword not detected")
     return False
 
+def log_event(device, actuator, state, topic):
+    payload = {
+        "device": device,
+        "actuator": actuator,
+        "state": state,
+        "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    }
+    print(f"[DEBUG] Logging event: {payload} to topic: {topic}")
+    db_utils.insert_event(json.dumps(payload), topic=topic)
+
 def categorise_command(tokens: list):
     if not tokens:
         return None
@@ -122,16 +134,19 @@ def categorise_command(tokens: list):
         if any(item in tokens for item in ["mode", "nuit"]):
             global mode_nuit_state
             respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
-            db_utils.insert_event(f"{mode_nuit_state}", topic="demande état mode nuit")
+            log_event(config["device_id"], f"Vox", f"demande status mode nuit: {'actif' if mode_nuit_state else 'inactif'}", config["TOPICS"]["vox"])
             return None, None
         else:
             global led_state
             respond("none", f"la lampe est {'on' if led_state else 'off'}")
             db_utils.insert_event(f"{led_state}", topic="demande état lampe")
+            log_event(config["device_id"], f"Vox", f"demande status lampe: {'on' if led_state else 'off'}", config["TOPICS"]["vox"])
+
             return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
         respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
-        db_utils.insert_event(f"demande temp : {gpio.cpu_temp()}", topic="demande temp")
+        log_event(config["device_id"], f"Vox", f"demande temp: {gpio.cpu_temp()} Celsius",
+                  config["TOPICS"]["vox"])
         return None, None
 
     # action commands
@@ -151,12 +166,18 @@ def categorise_command(tokens: list):
         elif cmd == "OFF":
             respond("nuit_off")
             print("mode nuit off")
+
+        log_event(config["device_id"], f"Vox", f"cmd mode nuit: {cmd}",
+                  config["TOPICS"]["vox"])
         return config["TOPICS"]["mode_nuit"], cmd
 
     if "clignote" in tokens:
         if cmd == "ON" or cmd == "OFF": #pour pouvoir toggle pour le moment
             respond("cling")
             print("clignote")
+
+        log_event(config["device_id"], f"Vox", f"demande toggle led clignote",
+                  config["TOPICS"]["vox"])
         return config["TOPICS"]["led_cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
@@ -166,10 +187,14 @@ def categorise_command(tokens: list):
         elif cmd == "OFF":
             respond("off")
             print("eteint la lampe")
+
+        log_event(config["device_id"], f"Vox", f"demande toggle lampe: {cmd}",
+                  config["TOPICS"]["vox"])
         return config["TOPICS"]["led_command"], cmd
 
     respond("error")
     print("je ne comprends pas")
+    log_event(config["device_id"], f"Vox", f"commande non compris", config["TOPICS"]["vox"])
     return config["TOPICS"]["error"] , "error"
 
 def wait_for_command():
@@ -311,7 +336,6 @@ result = client.publish(
     retain=True)
 
 result.wait_for_publish()
-# topic = "maison/voix"
 
 try:
     mic, r = init_mic()
