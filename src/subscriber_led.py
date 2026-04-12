@@ -60,16 +60,20 @@ def on_message(client, userdata, msg):
     classification = client_utils.classify_kind(msg.topic)
     # print(f"[MSG] raw_message={msg.payload} classification={classification}")
     payload = msg.payload.decode("utf-8", errors="replace")
-    data = json.loads(payload)
+    try:
+        data = json.loads(payload)
+    except json.JSONDecodeError:
+        data = {"state": payload}
     print(
         f"[MSG] topic={msg.topic} "
         f"qos={msg.qos} retain={msg.retain} "
         f"payload={payload}")
     if client_utils.is_telemetry(msg.topic):
         db_utils.insert_measurement(payload, topic=msg.topic)
-    cmd = payload.strip().upper()
+
     print(f"[CMD] {payload}")
     if classification == "cmd":
+        cmd = (data["state"]).strip().upper()
         if cmd in ["ON"]:
             led.led_on()
             print("led on")
