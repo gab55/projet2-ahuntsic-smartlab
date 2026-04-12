@@ -46,10 +46,11 @@ class Led:
         if mock:
             print("Mock led on")
         else:
-            if self.blink_state:
-                self.blink_state = False
-            GPIO.output(self.pin, GPIO.HIGH)
-            self.state = True
+            if not self.state:
+                if self.blink_state:
+                    self.blink_state = False
+                GPIO.output(self.pin, GPIO.HIGH)
+                self.state = True
 
 
     def led_off(self):
@@ -60,10 +61,11 @@ class Led:
         if mock:
             print("Mock led off")
         else:
-            if self.blink_state:
-                self.blink_state = False
-            GPIO.output(self.pin, GPIO.LOW)
-            self.state = False
+            if self.state:
+                if self.blink_state:
+                    self.blink_state = False
+                GPIO.output(self.pin, GPIO.LOW)
+                self.state = False
 
     def led_toggle(self):
         if self.state:
