@@ -118,7 +118,7 @@ def categorise_command(tokens: list):
     if not tokens:
         return None
     # status commands
-    if any(item in tokens for item in ["etat", "etats"]):
+    if any(item in tokens for item in ["etat", "etats", "status", "statut"]):
         if any(item in tokens for item in ["mode", "nuit"]):
             global mode_nuit_state
             respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
@@ -154,17 +154,17 @@ def categorise_command(tokens: list):
         return config["TOPICS"]["mode_nuit"], cmd
 
     if "clignote" in tokens:
-        if cmd == "ON" or cmd == "OFF" or cmd: #pour pouvoir toggle pour le moment
+        if cmd == "ON" or cmd == "OFF": #pour pouvoir toggle pour le moment
             respond("cling")
             print("clignote")
         return config["TOPICS"]["led_cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
         if cmd == "ON":
-            respond("ON")
+            respond("on")
             print("allume la lampe")
         elif cmd == "OFF":
-            respond("OFF")
+            respond("off")
             print("eteint la lampe")
         return config["TOPICS"]["led_command"], cmd
 
@@ -187,10 +187,10 @@ def speak(text, lang="fr", speed=150):
     tts
     """
     if system_name == "darwin":
-        subprocess.run(["say", "-v", "amélie", text])
+        subprocess.run(["say", "-v", "amélie", text], check=True)
     else:
         try:
-            subprocess.run(["espeak-ng", "-v", lang, "-s", str(speed), text])
+            subprocess.run(["espeak-ng", "-v", lang, "-s", str(speed), text], check=True)
         except FileNotFoundError:
             print("espeak-ng not found, using say instead")
 
@@ -204,10 +204,10 @@ def play(file):
         print(f"File {file_path} not found")
         return
     if system_name == "darwin":
-        subprocess.run(["afplay", file_path])
+        subprocess.run(["afplay", file_path], check=True)
     else:
         try:
-            subprocess.run(["ffplay", "-nodisp", "-autoexit", file_path])
+            subprocess.run(["ffplay", "-nodisp", "-autoexit", file_path], check=True)
         except FileNotFoundError:
             print("aplay not found")
 
