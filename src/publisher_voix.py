@@ -111,12 +111,14 @@ def categorise_command(tokens: list):
         return None
     if "etat" in tokens:
         if any(item in tokens for item in ["mode", "nuit"]):
+            global mode_nuit_state
             respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
             db_utils.insert_event(f"{mode_nuit_state}", topic="demande état mode nuit")
             return None, None
         else:
-            respond("none", f"la lampe est {'on' if state_led else 'off'}")
-            db_utils.insert_event(f"{state_led}", topic="demande état lampe")
+            global led_state
+            respond("none", f"la lampe est {'on' if led_state else 'off'}")
+            db_utils.insert_event(f"{led_state}", topic="demande état lampe")
             return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
         respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
@@ -293,17 +295,16 @@ try:
                 print("hotword detected")
                 respond("ecoute")
                 topic, command = wait_for_command()
-                if command is not None:
+                if command is not None and topic is not None:
                     print(f"[MSG] topic: {topic} command: {command}")
-                    if topic is not None:
-                        payload = {classify_kind(topic): command}
-                        client.publish(
-                            topic=topic,
-                            payload=json.dumps(payload),  # dict Python -> string JSON
-                            qos=1,
-                            retain=False)
-                        # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-                        print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+                    payload = {classify_kind(topic): command}
+                    client.publish(
+                        topic=topic,
+                        payload=json.dumps(payload),  # dict Python -> string JSON
+                        qos=1,
+                        retain=False)
+                    # db_utils.insert_measurement(json.dumps(payload), topic=topic)
+                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
             else:
                 continue
         except Exception as e:
