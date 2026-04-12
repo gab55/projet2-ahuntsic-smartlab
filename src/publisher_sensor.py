@@ -17,7 +17,6 @@ import client_utils
 config = main_utils.get_config()
 
 # Configuration Settings
-
 client = mqtt.Client(
     client_id=config["client_id_pub"],
     callback_api_version = mqtt.CallbackAPIVersion.VERSION2)

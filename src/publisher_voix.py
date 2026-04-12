@@ -19,8 +19,8 @@ from client_utils import classify_kind
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import main_utils
 from db import db_utils
-mode_nuit_state = False
-state_led = False
+led_state = "La lampe est éteint"
+mode_nuit_state = "La mode nuit est désactivé"
 config = main_utils.get_config()
 MIC_INDEX = 1
 hotword = "bonjour"
@@ -213,7 +213,6 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
         print(f"[ERROR] Voix Connection failed with code {reason_code} {properties}")
         exit(1)
 
-
 def on_message(client, userdata, msg):
     classification = client_utils.classify_kind(msg.topic)
     # print(f"[MSG] raw_message={msg.payload} classification={classification}")
@@ -234,6 +233,35 @@ def on_message(client, userdata, msg):
         elif data["state"] == "OFF":
             mode_nuit_status = False
 
+
+    handlers = {
+        # status handlers
+        "led-state": handle_led_status,
+        "nuit-state": handle_mode_nuit_status,
+
+    }
+    if classification in handlers:
+        handlers[classification](client, data, payload)
+    elif msg.topic != config["TOPICS"]["temperature"]:
+        db_utils.insert_event(payload, topic=config["TOPICS"]["other"])
+
+def handle_led_status(client, data, payload):
+    if (data["state"]).strip().upper() == "ON":
+        led_state = "La lampe est allume"
+    elif (data["state"]).strip().upper() == "OFF":
+        led_state = "La lampe est fermée"
+    else:
+        led_state = "Le statut de la lampe est inconnue"
+    # db_utils.insert_event(payload, topic=config["TOPICS"]["led_status"])
+
+def handle_mode_nuit_status(client, data, payload):
+    if (data["state"]).strip().upper() == "ON":
+        mode_nuit_state = "La mode nuit est actif"
+    elif (data["state"]).strip().upper() == "OFF":
+        mode_nuit_state = "La mode nuit est désactivé"
+    else:
+        mode_nuit_state = "Le statut de la mode nuit est inconnu"
+    # db_utils.insert_event(payload, topic=config["TOPICS"]["mode_nuit_status"])
 
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect

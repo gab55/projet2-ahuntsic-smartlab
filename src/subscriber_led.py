@@ -15,6 +15,8 @@ import signal
 import gpio
 import client_utils
 config = main_utils.get_config()
+led_state = False
+mode_nuit_state = False
 
 led = gpio.Led(config['led'])
 mode_nuit = gpio.Led(config['led_mode_nuit'])
@@ -26,55 +28,93 @@ def on_connect(client, userdata, flags, reason_code, properties=None):
     print(f"[CONNECT] reason_code={reason_code}")
     gpio.gpio_init()
     if reason_code == 0:
-        client.subscribe(config["TOPICS"]["led_command"], qos=1)
-        client.subscribe(config["TOPICS"]["presence"], qos=1)
-        # client.subscribe(config["TOPICS"]["led_status"], qos=1)
         client.subscribe(config["TOPICS"]["temperature"], qos=0)
+
+        client.subscribe(config["TOPICS"]["presence"], qos=1)
         client.subscribe(config["TOPICS"]["presence_voix"], qos=1)
+
+        client.subscribe(config["TOPICS"]["led_command"], qos=1)
         client.subscribe(config["TOPICS"]["mode_nuit"], qos=1)
+        client.subscribe(config["TOPICS"]["led_cling"], qos=1)
+
+        client.subscribe(config["TOPICS"]["led_status"], qos=1)
+        client.subscribe(config["TOPICS"]["mode_nuit_status"], qos=1)
+        client.subscribe(config["TOPICS"]["other"], qos=1)
+
 
     else:
         print("[ERROR] Connexion refusée ou échouée. Verifier Mosquitto, host, port, auth.")
         exit(1)
 
-
-
-# def command(payload, led, cmd):
-#     print(f"[CMD] {payload}")
-#     if cmd not in ["ON", "OFF"]:
-#         raise ValueError("state must be ON or OFF")
-#     elif cmd in ["ON"]:
-#         led.led_on()
-#         print("led on")
-#         return "ON"
-#     elif cmd in ["OFF"]:
-#         led.led_off()
-#         print("led off")
-#         return "OFF"
-#     else:
-#         return "ERROR"
-
-
-
 def on_message(client, userdata, msg):
     classification = client_utils.classify_kind(msg.topic)
-    # print(f"[MSG] raw_message={msg.payload} classification={classification}")
     payload = msg.payload.decode("utf-8", errors="replace")
+    print(
+        f"[MSG] topic={msg.topic} "
+        f"qos={msg.qos} retain={msg.retain} "
+        f"payload={payload}"
+    )
+
     try:
         data = json.loads(payload)
     except json.JSONDecodeError:
         data = {"state": payload}
-    print(
-        f"[MSG] topic={msg.topic} "
-        f"qos={msg.qos} retain={msg.retain} "
-        f"payload={payload}")
+
+    # handle temperature readings
     if client_utils.is_telemetry(msg.topic):
         db_utils.insert_measurement(payload, topic=msg.topic)
 
-    print(f"[CMD] {payload}")
-    if classification == "cmd":
-        cmd = (data["state"]).strip().upper()
-        if cmd in ["ON"]:
+    handlers = {
+        # command handlers
+        "nuit-cmd": handle_mode_nuit,
+        "led_cmd": handle_led_command,
+        "led-cling": handle_cling,
+
+        # presence handlers
+        "presence": handle_presence,
+        "presence_voix": handle_presence_voix,
+
+        # status handlers
+        "led-state": handle_led_status,
+        "nuit-state": handle_mode_nuit_status,
+
+        # other handlers
+        "other": handle_error,
+    }
+    if classification in handlers:
+        handlers[classification](client, data, payload)
+    elif msg.topic != config["TOPICS"]["temperature"]:
+        db_utils.insert_event(payload, topic=config["TOPICS"]["other"])
+
+
+def handle_presence(client, data, payload):
+    db_utils.insert_event(payload, topic=config["TOPICS"]["presence"])
+
+def handle_presence_voix(client, data, payload):
+    db_utils.insert_event(payload, topic=config["TOPICS"]["presence_voix"])
+
+def handle_mode_nuit(client, data, payload):
+    cmd = (data["state"]).strip().upper()
+    if cmd in ["ON", "OFF"]:
+        if cmd == "ON":
+            mode_nuit.led_on()
+            print("led on")
+            state = "ON"
+        elif cmd in ["OFF"]:
+            mode_nuit.led_off()
+            print("led off")
+            state = "OFF"
+        payload = {"state": state}
+
+        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+        log_event(config["device_id"], f"mode_nuit", state, config["TOPICS"]["mode_nuit"])
+    else:
+        print("[error] mode nuit must be ON or OFF")
+
+def handle_led_command(client, data, payload):
+    cmd = (data["state"]).strip().upper()
+    if cmd in ["ON", "OFF"]:
+        if cmd == "ON":
             led.led_on()
             print("led on")
             state = "ON"
@@ -82,75 +122,42 @@ def on_message(client, userdata, msg):
             led.led_off()
             print("led off")
             state = "OFF"
-        else:
-            state = "ERROR"
-        payload = {"state": cmd}
+        payload = {"state": state}
+
         client.publish(config["TOPICS"]["led_status"], json.dumps(payload), qos=1, retain=True)
-
-        payload = {
-            "device": config["device_id"],
-            "actuator": f"led-{config['led']}",
-            "state": f"{state}",
-            "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_command"])
-
-    elif classification == "state":
-        db_utils.insert_event(payload, topic=config["TOPICS"]["led_status"])
-    elif classification == "status":
-        db_utils.insert_event(payload, topic=config["TOPICS"]["presence"])
-    elif classification == "etat":
-        db_utils.insert_event(payload, topic=config["TOPICS"]["etat"])
-    elif classification == "nuit":
-        if cmd == "ON":
-            mode_nuit.led_on()
-            print("led on")
-            state = "ON"
-        elif cmd == "OFF":
-            mode_nuit.led_off()
-            print("led off")
-            state = "OFF"
-        else:
-            state = "ERROR"
-        payload = {"state": cmd}
-        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
-        payload = {
-            "device": config["device_id"],
-            "actuator": f"mode_nuit",
-            "state": f"{state}",
-            "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["mode_nuit"])
-
-    elif classification == "cling":
-        led.led_blink()
-        if not led.blink_state:
-            cmd = "blink off"
-        else:
-            cmd = "blink on"
-        print(f"cling {cmd}")
-        payload = {cmd}
-        # client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
-
-        payload = {
-            "device": config["device_id"],
-            "actuator": f"mode_nuit",
-            "state": f"{cmd}",
-            "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-        db_utils.insert_event(json.dumps(payload), topic=config["TOPICS"]["led_status"])
-
-
+        log_event(config["device_id"], f"led-{config['led']}", state, config["TOPICS"]["led_command"])
     else:
-        if msg.topic == config['TOPICS']['temperature']:
-            return
-        db_utils.insert_event(payload, topic=config["TOPICS"]["other"])
+        print("[error] led must be ON or OFF")
 
+def handle_led_status(client, data, payload):
+    db_utils.insert_event(payload, topic=config["TOPICS"]["led_status"])
+
+def handle_mode_nuit_status(client, data, payload):
+    db_utils.insert_event(payload, topic=config["TOPICS"]["mode_nuit_status"])
+
+def handle_error(client, data, payload):
+    print("[ERROR] ", payload)
+
+def handle_cling(client, data, payload):
+    led.led_blink()
+    cmd = "blink on" if led.blink_state else "blink off"
+    print(f"cling {cmd}")
+    log_event(config["device_id"], f"lampe_blink", cmd, config["TOPICS"]["other"])
+
+def log_event(device, actuator, state, topic):
+    payload = {
+        "device": device,
+        "actuator": actuator,
+        "state": state,
+        "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    }
+    db_utils.insert_event(json.dumps(payload), topic=topic)
 
 def signal_handler(signal, frame):
     print("Quitting Subscriber")
     client.loop_stop()
     client.disconnect()
     sys.exit(0)
-
-
 
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect

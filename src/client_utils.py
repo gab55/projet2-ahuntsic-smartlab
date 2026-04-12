@@ -5,19 +5,23 @@ def classify_kind(topic: str) -> str:
     """
     Classe l'événement selon le topic.
     """
-    if "led-cmd" in topic:
-        return "cmd"
-    if "/state" in topic:
-        return "state" # led state
+    if "led" in topic:
+        if "cmd" in topic:
+            return "led-cmd"
+        elif "state" in topic:
+            return "led-state" # led state
+        elif "cling" in topic:
+            return "led-cling"
+    if "nuit" in topic:
+        if "cmd" in topic:
+            return "nuit-cmd"
+        elif "state" in topic:
+            return "nuit-state"
     if "/status/" in topic:
-        return "status" # presence
-    if "etat" in topic:
-        return "etat"
-    if "nuit-cmd" in topic:
-        return "nuit"
-    if "cling" in topic:
-        return "cling"
-
+        if "online" in topic:
+            return "presence"
+        elif "voix" in topic:
+            return "presence_voix"
     return "other"
 
 def is_telemetry(topic: str) -> bool:
