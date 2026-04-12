@@ -60,7 +60,7 @@ def on_message(client, userdata, msg):
     classification = client_utils.classify_kind(msg.topic)
     # print(f"[MSG] raw_message={msg.payload} classification={classification}")
     payload = msg.payload.decode("utf-8", errors="replace")
-
+    data = json.loads(payload)
     print(
         f"[MSG] topic={msg.topic} "
         f"qos={msg.qos} retain={msg.retain} "
@@ -124,7 +124,7 @@ def on_message(client, userdata, msg):
             cmd = "blink on"
         print(f"cling {cmd}")
         payload = {cmd}
-        client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
+        # client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
 
         payload = {
             "device": config["device_id"],

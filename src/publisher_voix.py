@@ -107,14 +107,16 @@ def categorise_command(tokens: list):
     if "etat" in tokens:
         if any(item in tokens for item in ["mode", "nuit"]):
             respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
-            return config["topic"]["etat"], "nuit"
+            db_utils.insert_event(f"{mode_nuit_state}", topic="demande état mode nuit")
+            return None
         else:
             respond("none", f"la lampe est {'on' if state_led else 'off'}")
             db_utils.insert_event(f"{state_led}", topic="demande état lampe")
             return None
     if any(item in tokens for item in ["temperature", "cpu"]):
         respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
-        return config["topic"]["etat"], "temp"
+        db_utils.insert_event(f"{gpio.cpu_temp()}", topic="demande temp")
+        return None
     if any(item in tokens for item in ["allumer", "on", "activer", "active"]):
         cmd = "ON"
     elif any(item in tokens for item in ["desactiver", "off", "eteint"]):
@@ -132,8 +134,7 @@ def categorise_command(tokens: list):
         return config["topic"]["nuit"], cmd
 
     if "clignote" in tokens:
-        if cmd == "ON" or cmd == "error":
-            cmd = "ON"
+        if cmd == "ON" or cmd == "error" or cmd == "OFF":
             respond("cling")
             print("clignote")
         return config["topic"]["cling"], cmd
@@ -149,15 +150,15 @@ def categorise_command(tokens: list):
 
     respond("error")
     print("je ne comprends pas")
-    return config["topic"]["error"] , "object"
+    return config["topic"]["error"] , "error"
 
 def wait_for_command():
     words = listen()
     tokens = voix_normalise(words)
     if tokens is None:
         return None
-    return categorise_command(words)
-
+    topic, cmd = categorise_command(tokens)
+    return topic, cmd
 
 system_name = platform.system().lower()
 
@@ -191,8 +192,6 @@ def respond(category, text=""):
     else:
         play(random.choice(rec_liste["error"]))
 
-
-
 client = mqtt.Client(
     client_id=config["client_id_vox"],
     callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
@@ -219,20 +218,20 @@ def on_message(client, userdata, msg):
     classification = client_utils.classify_kind(msg.topic)
     # print(f"[MSG] raw_message={msg.payload} classification={classification}")
     payload = msg.payload.decode("utf-8", errors="replace")
-
+    data = json.loads(payload)
     print(
         f"[MSG] topic={msg.topic} "
         f"qos={msg.qos} retain={msg.retain} "
         f"payload={payload}")
     if "etat" in msg.topic:
-        if payload["state"] == "ON":
+        if data["state"] == "ON":
             led_status = True
-        elif payload["state"] == "OFF":
+        elif data["state"] == "OFF":
             led_status = False
     if "mode_nuit/state" in msg.topic:
-        if payload["state"] == "ON":
+        if data["state"] == "ON":
             mode_nuit_status = True
-        elif payload["state"] == "OFF":
+        elif data["state"] == "OFF":
             mode_nuit_status = False
 
 
@@ -264,36 +263,24 @@ try:
             print("wait for hotword")
             if wait_for_hotword():
                 print("hotword detected")
-                command = wait_for_command()
+                topic, command = wait_for_command()
                 if command is not None:
                     print(f"[MSG] {command}")
-                    topic, cmd = command
-                    payload = {classify_kind(topic): cmd}
-                    client.publish(
-                        topic=topic,
-                        payload=json.dumps(payload),  # dict Python -> string JSON
-                        qos=1,
-                        retain=False)
-                    # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+                    if topic is not None:
+                        payload = {classify_kind(topic): command}
+                        client.publish(
+                            topic=topic,
+                            payload=json.dumps(payload),  # dict Python -> string JSON
+                            qos=1,
+                            retain=False)
+                        # db_utils.insert_measurement(json.dumps(payload), topic=topic)
+                        print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
             else:
                 continue
         except Exception as e:
             print(f"[ERROR] {e}")
             continue
 
-        print(f"[MSG] {topic} -> {command}")
-        # if topic is config["topic"]["led_command"]:
-        payload = {command}
-        # else:
-        #     payload = {
-        #         "device": config["device_id"],
-        #         "sensor": "microphone",
-        #         "value": command,  # valeur numerique
-        #         "ts": datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
-
-        # Publication de la mesure
-            # time.sleep(config["measure_interval"])
 
 except KeyboardInterrupt:
     print("\n[STOP] arrêt demande")
