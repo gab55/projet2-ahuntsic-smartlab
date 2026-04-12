@@ -126,7 +126,7 @@ def handle_led_command(client, data, payload):
         payload = {"state": state}
 
         client.publish(config["TOPICS"]["led_status"], json.dumps(payload), qos=1, retain=True)
-        log_event(config["device_id"], f"led-{config['led']}", state, config["TOPICS"]["led_command"])
+        log_event(config["device_id"], f"mode nuit", state, config["TOPICS"]["led_command"])
     else:
         print("[error] led must be ON or OFF")
 
