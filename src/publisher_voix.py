@@ -59,11 +59,7 @@ def voix_normalise(text):
     words = regex_pattern.findall(text.lower())
     return [cached_lemmantizer(word) for word in words if word not in stopwords]
 
-def listen(timeout=1):
-    """
-    wait for speech input
-    return: list of normalized words
-    """
+def init_mic():
     mic = sr.Microphone(device_index=MIC_INDEX)
     r = sr.Recognizer()
     r.dynamic_energy_threshold = False
@@ -74,7 +70,14 @@ def listen(timeout=1):
         r.adjust_for_ambient_noise(source, duration=0.3)
         print("seuil energie calibre = ", r.energy_threshold)
         print("parlez maintenant....")
+    return mic, r
 
+def listen(timeout=1, mic, r):
+    """
+    wait for speech input
+    return: list of normalized words
+    """
+    with mic as source:
         try:
             audio = r.listen(source, timeout=timeout, phrase_time_limit=4)
         except sr.WaitTimeoutError:
@@ -90,21 +93,22 @@ def listen(timeout=1):
             print(f"Could not request results from Google Speech Recognition service; {e}")
             return None
 
-def wait_for_hotword():
-    text = listen()
+def wait_for_hotword(mic, r):
+    text = listen(mic, r)
     if text is None:
         print("[INFO] No speech detected")
         return False
+
     tokens = voix_normalise(text)
-    print(f"hotwords are [{hotwords}] detection: {text}, tokens:{tokens}")
+    print(f"hotwords are {hotwords} detection: text: {text}, tokens:{tokens}")
+
     for hotword in hotwords:
-        if hotword.lower().strip() in tokens or hotword.lower().strip in text:
+        if (hotword.lower().strip() in [t.lower().strip for t in tokens]
+                or hotword.lower().strip() in text.lower().strip()):
             print("[INFO] Hotword detected")
             return True
-        else:
-            print("[INFO] Hotword not detected")
-            return False
-    return None
+    print("[INFO] Hotword not detected")
+    return False
 
 
 def categorise_command(tokens: list):
@@ -160,8 +164,8 @@ def categorise_command(tokens: list):
     print("je ne comprends pas")
     return config["topic"]["error"] , "error"
 
-def wait_for_command():
-    text = listen(timeout=8)
+def wait_for_command(mic, r):
+    text = listen(timeout=8, mic=mic, r=r)
     if text is None:
         return None, None
     tokens = voix_normalise(text)
@@ -289,13 +293,14 @@ result = client.publish(
 result.wait_for_publish()
 
 try:
+    mic, r = init_mic()
     while True:
         try:
             print("wait for hotword")
-            if wait_for_hotword():
+            if wait_for_hotword(mic, r):
                 print("hotword detected")
                 respond("ecoute")
-                topic, command = wait_for_command()
+                topic, command = wait_for_command(mic, r)
                 if command is not None and topic is not None:
                     print(f"[MSG] topic: {topic} command: {command}")
                     payload = {classify_kind(topic): command}
