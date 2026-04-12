@@ -21,7 +21,7 @@ mode_nuit_state = False
 state_led = False
 config = main_utils.get_config()
 MIC_INDEX = 1
-hotword = "pi"
+hotword = "bonjour"
 topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
@@ -91,9 +91,8 @@ def wait_for_hotword():
     if text is None:
         return False
     tokens = voix_normalise(text)
-    if text is None or text == "error":
-        return False
     print(f"hotword detection: {text}")
+    print(f"tokens: {tokens}")
     if hotword in text.lower() or any(hotword in token for token in tokens):
             print("Hotword detected")
             return True
