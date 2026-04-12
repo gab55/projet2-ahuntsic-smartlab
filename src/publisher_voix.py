@@ -23,7 +23,7 @@ led_state = "La lampe est éteint"
 mode_nuit_state = "La mode nuit est désactivé"
 config = main_utils.get_config()
 MIC_INDEX = 1
-hotword = "bonjour"
+hotword = ["bonjour", "maison"]
 topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
