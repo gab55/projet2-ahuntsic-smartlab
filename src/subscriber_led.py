@@ -64,7 +64,7 @@ def on_message(client, userdata, msg):
     if client_utils.is_telemetry(msg.topic):
         db_utils.insert_measurement(payload, topic=msg.topic)
 
-    else:
+    elif not client_utils.is_telemetry(msg.topic):
         handlers = {
             # command handlers
             "nuit-cmd": handle_mode_nuit,
