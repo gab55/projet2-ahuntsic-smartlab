@@ -22,7 +22,6 @@ mode_nuit_state = "La mode nuit est désactivé"
 config = main_utils.get_config()
 MIC_INDEX = 1
 
-topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
     "non": ["./aiff/aff.neg"],#"Non"
@@ -68,7 +67,7 @@ def init_mic():
     r.pause_threshold = 1
     with mic as source:
         print("ajustement de l'environnement")
-        r.adjust_for_ambient_noise(source, duration=0.3)
+        r.adjust_for_ambient_noise(source, duration=2)
         print("seuil energie calibre = ", r.energy_threshold)
         print("parlez maintenant....")
     return mic, r
@@ -311,6 +310,7 @@ result = client.publish(
     retain=True)
 
 result.wait_for_publish()
+# topic = "maison/voix"
 
 try:
     mic, r = init_mic()
@@ -323,15 +323,15 @@ try:
                 topic, command = wait_for_command()
                 print(f"[MSG] topic: {topic} command: {command}")
 
-                if command is not None and topic is not None:
-                    payload = {"state": command}
-                    client.publish(
-                        topic=topic,
-                        payload=json.dumps(payload),  # dict Python -> string JSON
-                        qos=1,
-                        retain=False)
-                    # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+                # if command is not None and topic is not None:
+                #     payload = {"state": command}
+                #     client.publish(
+                #         topic=topic,
+                #         payload=json.dumps(payload),  # dict Python -> string JSON
+                #         qos=1,
+                #         retain=False)
+                #     # db_utils.insert_measurement(json.dumps(payload), topic=topic)
+                #     print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
             else:
                 continue
         except Exception as e:
