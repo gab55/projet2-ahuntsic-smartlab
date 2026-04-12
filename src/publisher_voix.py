@@ -82,6 +82,7 @@ def listen(timeout=1):
     if mic is None or r is None:
         mic, r = init_mic()
     with mic as source:
+        print("[INFO] listening...")
         try:
             audio = r.listen(source, timeout=timeout, phrase_time_limit=4)
         except sr.WaitTimeoutError:
@@ -117,6 +118,7 @@ def wait_for_hotword():
 def categorise_command(tokens: list):
     if not tokens:
         return None
+    # status commands
     if any(item in tokens for item in ["etat", "etats"]):
         if any(item in tokens for item in ["mode", "nuit"]):
             global mode_nuit_state
@@ -132,6 +134,9 @@ def categorise_command(tokens: list):
         respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
         db_utils.insert_event(f"{gpio.cpu_temp()}", topic="demande temp")
         return None, None
+
+    # action commands
+    # states
     if any(item in tokens for item in ["allumer", "on", "activer", "active"]):
         cmd = "ON"
     elif any(item in tokens for item in ["desactiver", "off", "eteint", "eteins", "etein"]):
@@ -139,6 +144,7 @@ def categorise_command(tokens: list):
     else:
         cmd = "error"
 
+    # Objects
     if any(item in tokens for item in ["mode", "nuit"]):
         if cmd == "ON":
             respond("nuit_on")
@@ -149,7 +155,7 @@ def categorise_command(tokens: list):
         return config["topic"]["nuit"], cmd
 
     if "clignote" in tokens:
-        if cmd == "ON" or cmd == "error" or cmd == "OFF":
+        if cmd == "ON" or cmd == "OFF":
             respond("cling")
             print("clignote")
         return config["topic"]["cling"], cmd
@@ -179,6 +185,9 @@ def wait_for_command():
 system_name = platform.system().lower()
 
 def speak(text, lang="fr", speed=150):
+    """
+    tts
+    """
     if system_name == "darwin":
         subprocess.run(["say", "-v", "amélie", text])
     else:
@@ -188,6 +197,10 @@ def speak(text, lang="fr", speed=150):
             print("espeak-ng not found, using say instead")
 
 def play(file):
+    """
+    play a file
+    no return value
+    """
     file_path = main_utils.abs_path(file)
     if not os.path.exists(file_path):
         print(f"File {file_path} not found")
@@ -201,6 +214,10 @@ def play(file):
             print("aplay not found")
 
 def respond(category, text=""):
+    """
+    respond to a command
+    no return value
+    """
     if category in rec_liste:
         play(random.choice(rec_liste[category]))
     elif text:
@@ -304,9 +321,10 @@ try:
                 print("hotword detected")
                 respond("ecoute")
                 topic, command = wait_for_command()
+                print(f"[MSG] topic: {topic} command: {command}")
+
                 if command is not None and topic is not None:
-                    print(f"[MSG] topic: {topic} command: {command}")
-                    payload = {classify_kind(topic): command}
+                    payload = {"state": command}
                     client.publish(
                         topic=topic,
                         payload=json.dumps(payload),  # dict Python -> string JSON
