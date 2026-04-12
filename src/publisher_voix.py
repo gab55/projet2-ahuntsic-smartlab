@@ -151,13 +151,13 @@ def categorise_command(tokens: list):
         elif cmd == "OFF":
             respond("nuit_off")
             print("mode nuit off")
-        return config["topic"]["nuit"], cmd
+        return config["TOPICS"]["nuit"], cmd
 
     if "clignote" in tokens:
         if cmd == "ON" or cmd == "OFF":
             respond("cling")
             print("clignote")
-        return config["topic"]["cling"], cmd
+        return config["TOPICS"]["cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
         if cmd == "ON":
@@ -166,11 +166,11 @@ def categorise_command(tokens: list):
         elif cmd == "OFF":
             respond("OFF")
             print("eteint la lampe")
-        return config["topic"]["led_command"], cmd
+        return config["TOPICS"]["led_command"], cmd
 
     respond("error")
     print("je ne comprends pas")
-    return config["topic"]["error"] , "error"
+    return config["TOPICS"]["error"] , "error"
 
 def wait_for_command():
     text = listen(timeout=8)
@@ -178,8 +178,7 @@ def wait_for_command():
         return None, None
     tokens = voix_normalise(text)
     print(f"tokens: {tokens}")
-    topic, cmd = categorise_command(tokens)
-    return topic, cmd
+    return categorise_command(tokens)
 
 system_name = platform.system().lower()
 
@@ -323,15 +322,15 @@ try:
                 topic, command = wait_for_command()
                 print(f"[MSG] topic: {topic} command: {command}")
 
-                # if command is not None and topic is not None:
-                #     payload = {"state": command}
-                #     client.publish(
-                #         topic=topic,
-                #         payload=json.dumps(payload),  # dict Python -> string JSON
-                #         qos=1,
-                #         retain=False)
-                #     # db_utils.insert_measurement(json.dumps(payload), topic=topic)
-                #     print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
+                if command is not None and topic is not None:
+                    payload = {"state": command}
+                    client.publish(
+                        topic=topic,
+                        payload=json.dumps(payload),  # dict Python -> string JSON
+                        qos=1,
+                        retain=False)
+                    # db_utils.insert_measurement(json.dumps(payload), topic=topic)
+                    print(f"[PUB] {config["TOPICS"]["command_voix"]} -> {payload}")
             else:
                 continue
         except Exception as e:
