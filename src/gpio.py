@@ -82,7 +82,7 @@ class Led:
             if self.blink_state:
                 self.led.blink(on_time=duration/2, off_time=duration/2)
             else:
-                self.led.led_off()
+                self.led.led.off()
 
 
 
