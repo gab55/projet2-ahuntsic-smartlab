@@ -48,7 +48,7 @@ class Led:
         else:
             if not self.state:
                 if self.blink_state:
-                    self.blink_state = False
+                    self.led_blink()
                 GPIO.output(self.pin, GPIO.HIGH)
                 self.state = True
 
@@ -63,7 +63,7 @@ class Led:
         else:
             if self.state:
                 if self.blink_state:
-                    self.blink_state = False
+                    self.led_blink()
                 GPIO.output(self.pin, GPIO.LOW)
                 self.state = False
 
@@ -82,7 +82,7 @@ class Led:
             if self.blink_state:
                 self.led.blink(on_time=duration/2, off_time=duration/2)
             else:
-                self.led_off()
+                self.led.led_off()
 
 
 
