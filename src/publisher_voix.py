@@ -23,7 +23,7 @@ led_state = "La lampe est éteint"
 mode_nuit_state = "La mode nuit est désactivé"
 config = main_utils.get_config()
 MIC_INDEX = 1
-hotword = ["bonjour", "maison"]
+hotwords = ["bonjour", "maison"]
 topic = "maison/voix"
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
@@ -93,9 +93,12 @@ def wait_for_hotword():
     if text is None:
         return False
     tokens = voix_normalise(text)
-    print(f"hotword detection: {text}")
-    print(f"tokens: {tokens}")
-    if hotword in text.lower() or any(hotword in token for token in tokens):
+    print(f"hotwords are [{hotwords}] detection: {text}, tokens:{tokens}")
+    for hotword in hotwords:
+        if hotword.lower().strip() in tokens:
+            print("Hotword detected")
+            return True
+        if hotword.lower().strip() in text:
             print("Hotword detected")
             return True
     print("Hotword not detected")
