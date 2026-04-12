@@ -24,14 +24,14 @@ MIC_INDEX = 1
 
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
-    "non": ["./aiff/aff.neg"],#"Non"
+    "non": ["./aiff/neg.aiff"],#"Non"
     "ecoute": ["./aiff/ecoute.aiff", "./aiff/ecoute2.aiff"], #"Je vous écoute" "Oui?"
-    "on": ["./aiff/lampon.aiff", "./aiff/lampon2.aiff","./aiff/lampon3.aiff"],# "Lampe allumée"#"J'ai allumée la lampe"
-    "off": ["./aiff/lampoff.aiff", "./aiff/lampoff2.aiff", "./aiff/lampoff3.aiff"],# "J'ai éteint la lampe" "La lampe est éteint" "lampe éteint"
-    "nuit_on": ["./aiff/nuiton.aiff"],#"J'ai activé la mode nuit"
-    "nuit_off": ["./aiff/nuitoff.aiff"],#"J'ai desactivé la mode nuit"
-    "cling": ["./aiff/cling.aiff"],#"Je clignote la lampe"
-    "error": ["./aiff/error.aiff", "./aiff/error2.aiff","./aiff/error3.aiff"]}#"Je ne comprends pas"# Veuillez repeter"#"Je n'ai pas compris"#"Répétez, s'il vous plaît"
+    "on": ["./aiff/lampeon.aiff", "./aiff/lampeon2.aiff","./aiff/lampeon3.aiff"],# "Lampe allumée"#"J'ai allumée la lampe"
+    "off": ["./aiff/lampeoff1.aiff", "./aiff/lampeoff2.aiff", "./aiff/lampeoff3.aiff"],# "J'ai éteint la lampe" "La lampe est éteint" "lampe éteint"
+    "nuit_on": ["./aiff/modenuiton.aiff"],#"J'ai activé la mode nuit"
+    "nuit_off": ["./aiff/modenuitoff.aiff"],#"J'ai desactivé la mode nuit"
+    "cling": ["./aiff/clng.aiff"],#"Je clignote la lampe"
+    "error": ["./aiff/err.aiff", "./aiff/err2.aiff","./aiff/err3.aiff"]}#"Je ne comprends pas"# Veuillez repeter"#"Je n'ai pas compris"#"Répétez, s'il vous plaît"
 
 
 memory = Memory("cachedir", verbose=0)
