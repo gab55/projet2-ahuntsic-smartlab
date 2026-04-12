@@ -64,27 +64,28 @@ def on_message(client, userdata, msg):
     if client_utils.is_telemetry(msg.topic):
         db_utils.insert_measurement(payload, topic=msg.topic)
 
-    handlers = {
-        # command handlers
-        "nuit-cmd": handle_mode_nuit,
-        "led_cmd": handle_led_command,
-        "led-cling": handle_cling,
+    else:
+        handlers = {
+            # command handlers
+            "nuit-cmd": handle_mode_nuit,
+            "led_cmd": handle_led_command,
+            "led-cling": handle_cling,
 
-        # presence handlers
-        "presence": handle_presence,
-        "presence_voix": handle_presence_voix,
+            # presence handlers
+            "presence": handle_presence,
+            "presence_voix": handle_presence_voix,
 
-        # status handlers
-        "led-state": handle_led_status,
-        "nuit-state": handle_mode_nuit_status,
+            # status handlers
+            "led-state": handle_led_status,
+            "nuit-state": handle_mode_nuit_status,
 
-        # other handlers
-        "other": handle_error,
-    }
-    if classification in handlers:
-        handlers[classification](client, data, payload)
-    elif msg.topic != config["TOPICS"]["temperature"]:
-        db_utils.insert_event(payload, topic=config["TOPICS"]["other"])
+            # other handlers
+            "other": handle_error,
+        }
+        if classification in handlers:
+            handlers[classification](client, data, payload)
+        elif msg.topic != config["TOPICS"]["temperature"]:
+            db_utils.insert_event(payload, topic=config["TOPICS"]["other"])
 
 
 def handle_presence(client, data, payload):
