@@ -151,7 +151,7 @@ def categorise_command(tokens: list):
     return config["topic"]["error"] , "error"
 
 def wait_for_command():
-    text = listen()
+    text = listen(timeout=8)
     if text is None:
         return None, None
     tokens = voix_normalise(text)
