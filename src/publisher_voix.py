@@ -93,23 +93,24 @@ def listen(timeout=1):
 def wait_for_hotword():
     text = listen()
     if text is None:
+        print("[INFO] No speech detected")
         return False
     tokens = voix_normalise(text)
     print(f"hotwords are [{hotwords}] detection: {text}, tokens:{tokens}")
     for hotword in hotwords:
-        if hotword.lower().strip() in tokens:
-            print("Hotword detected")
+        if hotword.lower().strip() in tokens or hotword.lower().strip in text:
+            print("[INFO] Hotword detected")
             return True
-        if hotword.lower().strip() in text:
-            print("Hotword detected")
-            return True
-    print("Hotword not detected")
-    return False
+        else:
+            print("[INFO] Hotword not detected")
+            return False
+    return None
+
 
 def categorise_command(tokens: list):
     if not tokens:
         return None
-    if "etat" in tokens:
+    if any(item in tokens for item in ["etat", "etats"]):
         if any(item in tokens for item in ["mode", "nuit"]):
             global mode_nuit_state
             respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
@@ -126,7 +127,7 @@ def categorise_command(tokens: list):
         return None, None
     if any(item in tokens for item in ["allumer", "on", "activer", "active"]):
         cmd = "ON"
-    elif any(item in tokens for item in ["desactiver", "off", "eteint"]):
+    elif any(item in tokens for item in ["desactiver", "off", "eteint", "eteins", "etein"]):
         cmd = "OFF"
     else:
         cmd = "error"
