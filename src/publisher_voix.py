@@ -111,15 +111,15 @@ def categorise_command(tokens: list):
         if any(item in tokens for item in ["mode", "nuit"]):
             respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
             db_utils.insert_event(f"{mode_nuit_state}", topic="demande état mode nuit")
-            return None
+            return None, None
         else:
             respond("none", f"la lampe est {'on' if state_led else 'off'}")
             db_utils.insert_event(f"{state_led}", topic="demande état lampe")
-            return None
+            return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
         respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
         db_utils.insert_event(f"{gpio.cpu_temp()}", topic="demande temp")
-        return None
+        return None, None
     if any(item in tokens for item in ["allumer", "on", "activer", "active"]):
         cmd = "ON"
     elif any(item in tokens for item in ["desactiver", "off", "eteint"]):
@@ -236,12 +236,10 @@ def on_message(client, userdata, msg):
         elif data["state"] == "OFF":
             mode_nuit_status = False
 
-
     handlers = {
         # status handlers
         "led-state": handle_led_status,
         "nuit-state": handle_mode_nuit_status,
-
     }
     if classification in handlers:
         handlers[classification](client, data, payload)
@@ -275,9 +273,7 @@ client.connect(config["BROKER_HOST"], config["BROKER_PORT"], keepalive=config["K
 print("[INFO] Connected")
 print("[INFO] Waiting for messages")
 
-
 client.loop_start()
-
 
 result = client.publish(
     topic=config["TOPICS"]["presence_voix"],
