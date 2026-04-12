@@ -7,6 +7,8 @@ import sys
 
 import unicodedata
 import re
+from datetime import time
+
 from french_lefff_lemmatizer.french_lefff_lemmatizer import FrenchLefffLemmatizer
 import speech_recognition as sr
 
