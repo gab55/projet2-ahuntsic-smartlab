@@ -40,7 +40,7 @@ memory = Memory("cachedir", verbose=0)
 def cached_lemmantizer(word):
     return lemmatizer.lemmatize(word)
 
-
+# Speech Recognition
 lemmatizer = FrenchLefffLemmatizer()
 regex_pattern = re.compile(r"[^\W\d_]+", flags=re.UNICODE)
 mic = None
@@ -131,7 +131,7 @@ def categorise_command(tokens: list):
             return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
         respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
-        db_utils.insert_event(f"{gpio.cpu_temp()}", topic="demande temp")
+        db_utils.insert_event(f"demande temp : {gpio.cpu_temp()}", topic="demande temp")
         return None, None
 
     # action commands
@@ -194,6 +194,8 @@ def speak(text, lang="fr", speed=150):
         except FileNotFoundError:
             print("espeak-ng not found, using say instead")
 
+
+# tts functions
 def play(file):
     """
     play a file

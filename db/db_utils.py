@@ -95,24 +95,34 @@ def insert_event(json_str, topic):
     conn, cursor = db_conn()
 
     types = client_utils.classify_kind(topic)
-
-    query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
-             f"VALUES (%s, %s, %s, %s)")
     try:
         data = parse_json(json_str)
-
-        if not isinstance(data, dict):
-            print("Invalid JSON string for events")
-            conn_close(conn)
-            return
     except JSONDecodeError:
-        cursor.execute(query, (topic, "Json error", f"json error {json_str}", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
+        query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
+                 f"VALUES (%s, %s, %s, %s)")
+        cursor.execute(query,
+                       (topic, config["device_id"], json_str, datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
 
-    if types == "cmd" or types == "state":
-        cursor.execute(query,(topic, config["device_id"], json_str, datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
-    if types == "status": # presence
-        cursor.execute(query, (topic, config["device_id"], json_str, datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
+    if data is not None:
+        for key in data:
+            if data[key] is None:
+                print(f"VALUES ERROR | {key} : {data[key]}")
+                return
+        if types == "cmd" or types == "state":
+            query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
+                     f"VALUES (%s, %s, %s, %s)")
+            cursor.execute(query,
+                           (topic, config["device_id"], json_str,
+                            datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
+        if types == "status":  # presence
+            query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
+                     f"VALUES (%s, %s, %s, %s)")
+            cursor.execute(query, (topic, config["device_id"], json_str,
+                                   datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
 
+        # print(f"Data inserted into events table: {data}")
+    else:
+        print("Invalid JSON string for events")
     conn_close(conn)
 
 

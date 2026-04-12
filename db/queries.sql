@@ -2,7 +2,7 @@
 -- 1 - 2 requetes de plus
 -- last 10 by time
 
-SELECT* FROM events ORDER BY ts_utc DESC LIMIT 10;
+SELECT * FROM events ORDER BY ts_utc DESC LIMIT 10;
 
 
 
