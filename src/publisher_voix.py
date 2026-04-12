@@ -155,8 +155,7 @@ def wait_for_command():
     if text is None:
         return None, None
     tokens = voix_normalise(text)
-    if tokens is None:
-        return None
+    print(f"tokens: {tokens}")
     topic, cmd = categorise_command(tokens)
     return topic, cmd
 
