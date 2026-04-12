@@ -154,7 +154,7 @@ def categorise_command(tokens: list):
         return config["TOPICS"]["nuit"], cmd
 
     if "clignote" in tokens:
-        if cmd == "ON" or cmd == "OFF":
+        if cmd == "ON" or cmd == "OFF" or cmd: #pour pouvoir toggle pour le moment
             respond("cling")
             print("clignote")
         return config["TOPICS"]["cling"], cmd
