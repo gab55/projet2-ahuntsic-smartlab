@@ -68,7 +68,7 @@ def on_message(client, userdata, msg):
         handlers = {
             # command handlers
             "nuit-cmd": handle_mode_nuit,
-            "led_cmd": handle_led_command,
+            "led-cmd": handle_led_command,
             "led-cling": handle_cling,
 
             # presence handlers
