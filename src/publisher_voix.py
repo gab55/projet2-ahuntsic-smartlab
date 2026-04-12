@@ -2,7 +2,6 @@ import json
 import os
 import platform
 import random
-import signal
 import subprocess
 import sys
 import unicodedata
@@ -21,8 +20,6 @@ from db import db_utils
 mode_nuit_state = False
 state_led = False
 config = main_utils.get_config()
-BROKER_HOST = config["BROKER_HOST"]
-BROKER_PORT = config["BROKER_PORT_LOCAL"]
 MIC_INDEX = 1
 hotword = "pi"
 topic = "maison/voix"
@@ -207,7 +204,7 @@ client.will_set(
     retain=True)
 
 def on_connect(client, userdata, flags, reason_code, properties=None):
-    print(f"[INFO] Voix Connected with result code {reason_code}")
+    print(f"[INFO] Voix {config['client_id_vox']} Connected with result code {reason_code}")
     if reason_code == 0:
         print("[INFO] Voix Connected")
         client.subscribe(config["TOPICS"]["mode_nuit_status"], qos=1)
@@ -236,7 +233,6 @@ def on_message(client, userdata, msg):
             mode_nuit_status = True
         elif data["state"] == "OFF":
             mode_nuit_status = False
-
 
 
 client.on_connect = on_connect

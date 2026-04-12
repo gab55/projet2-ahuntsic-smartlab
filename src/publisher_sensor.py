@@ -19,7 +19,7 @@ config = main_utils.get_config()
 # Configuration Settings
 
 client = mqtt.Client(
-    client_id=config["client_id_vox"],
+    client_id=config["client_id_pub"],
     callback_api_version = mqtt.CallbackAPIVersion.VERSION2)
 client.username_pw_set(username=config["user"], password=config["password"])
 
@@ -31,7 +31,7 @@ client.will_set(
 
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
-        print("[INFO] Connected")
+        print(f"[INFO]{config['client_id_pub']} Connected")
     else:
         print(f"[ERROR] Connection failed with code {rc}")
         exit(1)
