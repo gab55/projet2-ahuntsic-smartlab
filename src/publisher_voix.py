@@ -151,13 +151,13 @@ def categorise_command(tokens: list):
         elif cmd == "OFF":
             respond("nuit_off")
             print("mode nuit off")
-        return config["TOPICS"]["nuit"], cmd
+        return config["TOPICS"]["mode_nuit"], cmd
 
     if "clignote" in tokens:
         if cmd == "ON" or cmd == "OFF" or cmd: #pour pouvoir toggle pour le moment
             respond("cling")
             print("clignote")
-        return config["TOPICS"]["cling"], cmd
+        return config["TOPICS"]["led_cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
         if cmd == "ON":
