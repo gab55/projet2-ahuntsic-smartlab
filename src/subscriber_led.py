@@ -152,7 +152,8 @@ def log_event(device, actuator, state, topic):
         "state": state,
         "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     }
-    db_utils.insert_event(payload, topic=topic)
+    print(f"[DEBUG] Logging event: {payload} to topic: {topic}")
+    db_utils.insert_event(json.dumps(payload), topic=topic)
 
 def signal_handler(signal, frame):
     print("Quitting Subscriber")

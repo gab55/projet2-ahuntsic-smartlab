@@ -93,37 +93,26 @@ def insert_event(json_str, topic):
     :return:
     """
     conn, cursor = db_conn()
+    if conn is None or cursor is None:
+        print("[ERROR] Could not connect to database")
+        return
 
-    types = client_utils.classify_kind(topic)
     try:
-        data = parse_json(json_str)
-    except JSONDecodeError:
         query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
                  f"VALUES (%s, %s, %s, %s)")
-        cursor.execute(query,
-                       (topic, config["device_id"], json_str, datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
+        cursor.execute(
+            query,
+            (topic,
+             config["device_id"],
+             json_str,
+             datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+             ),
+        )
+        conn.commit()
+        print(f"[DEBUG] Data inserted into events table: {json_str}")
+    except Exception as e:
+        print(f"[ERROR] DB error: {e}")
 
-    if data is not None:
-        for key in data:
-            if data[key] is None:
-                print(f"VALUES ERROR | {key} : {data[key]}")
-                return
-        if types == "cmd" or types == "state":
-            query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
-                     f"VALUES (%s, %s, %s, %s)")
-            cursor.execute(query,
-                           (topic, config["device_id"], json_str,
-                            datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
-        if types == "status":  # presence
-            query = (f"INSERT INTO events (topic, device, payload, ts_utc)"
-                     f"VALUES (%s, %s, %s, %s)")
-            cursor.execute(query, (topic, config["device_id"], json_str,
-                                   datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
-
-        # print(f"Data inserted into events table: {data}")
-    else:
-        print("Invalid JSON string for events")
-    conn_close(conn)
 
 
 def insert_measurement(json_str, topic):
@@ -139,8 +128,14 @@ def insert_measurement(json_str, topic):
     except JSONDecodeError:
         query = (f"INSERT INTO telemetry (topic, device, payload, ts_utc)"
                  f"VALUES (%s, %s, %s, %s)")
-        cursor.execute(query,
-                       (topic, config["device_id"], json_str, datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")))
+        cursor.execute(
+            query,
+            (topic,
+            config["device_id"],
+            json_str,
+            datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+            ),
+       )
 
     if data is not None:
         for key in data:
