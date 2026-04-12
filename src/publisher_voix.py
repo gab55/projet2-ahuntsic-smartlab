@@ -144,8 +144,9 @@ def categorise_command(tokens: list):
 
             return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
-        respond("none", text=f"la temperature est {gpio.cpu_temp()} Celsius")
-        log_event(config["device_id"], f"Vox", f"demande temp: {gpio.cpu_temp()} Celsius",
+        temp = round(gpio.cpu_temp())
+        respond("none", text=f"la temperature est {temp} Celsius")
+        log_event(config["device_id"], f"Vox", f"demande temp: {temp} Celsius",
                   config["TOPICS"]["vox"])
         return None, None
 
