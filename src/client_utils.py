@@ -42,7 +42,7 @@ def parse_json(json_str: str):
         data = json.loads(json_str)
         return data if isinstance(data, dict) else None
     except json.JSONDecodeError as e:
-        return False
+        return None
 
 def on_disconnect(client, userdata, disconnect_flags, reason_code, properties=None, *args):
     print(f"[DISCONNECT] disconnect_flags: {disconnect_flags}  reason_code: {reason_code}")
