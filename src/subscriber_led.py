@@ -108,7 +108,7 @@ def handle_mode_nuit(client, data, payload):
         payload = {"state": state}
 
         client.publish(config["TOPICS"]["mode_nuit_status"], json.dumps(payload), qos=1, retain=True)
-        log_event(config["device_id"], f"mode_nuit", state, config["TOPICS"]["mode_nuit"])
+        log_event(config["device_id"], "mode_nuit", state, config["TOPICS"]["mode_nuit"])
     else:
         print("[error] mode nuit must be ON or OFF")
 
@@ -152,7 +152,7 @@ def log_event(device, actuator, state, topic):
         "state": state,
         "ts": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     }
-    db_utils.insert_event(json.dumps(payload), topic=topic)
+    db_utils.insert_event(payload, topic=topic)
 
 def signal_handler(signal, frame):
     print("Quitting Subscriber")
