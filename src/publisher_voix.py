@@ -211,7 +211,7 @@ def categorise_command(tokens: list):
 
     respond("error")
     print("je ne comprends pas")
-    log_event(config["device_id"], f"Vox", f"commande non compris", config["TOPICS"]["vox"])
+    log_event(config["device_id"], f"Vox", f"cmd non-compris tokens: {tokens}", config["TOPICS"]["vox"])
     return config["TOPICS"]["error"] , "error"
 
 def wait_for_command():
