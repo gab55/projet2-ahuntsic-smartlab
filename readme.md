@@ -82,8 +82,8 @@ from joblib import Memory
 
 L'object du project est de créer un système de gestion automatique de la maison qui reconnait les commandes vocales et les commandes par dashboard mqtt.
 
-* Le retour vocal raiser d'utiliser des voix préenregistré avant d'utiliser la voix tts
-* Le minimizer est un specialize en français qui aide à améliorer les résultats
+* Le retour vocal raiser d'utiliser des voix préenregistré avant d'utiliser la voix tts pour un melange de qualite, performance et flexibilite
+* Le lemmatizer est un specialize en français qui aide à améliorer les résultats vs nltk mais fonctionne de conceptuellement pareil
 * la fonction de normalisation réduit les mots inutiles et cache les mots pour éviter les repetitions et améliorer la vitesse
 * dans le futur les commandes precedents pourraient aussi être aussi sauve en cache avec leur lemma pour aussi ameliorate les résultats
 * Vox
