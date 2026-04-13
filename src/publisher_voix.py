@@ -295,16 +295,6 @@ def on_message(client, userdata, msg):
         f"[MSG] topic={msg.topic} "
         f"qos={msg.qos} retain={msg.retain} "
         f"payload={payload}")
-    if "etat" in msg.topic:
-        if data["state"] == "ON":
-            led_status = True
-        elif data["state"] == "OFF":
-            led_status = False
-    if "mode_nuit/state" in msg.topic:
-        if data["state"] == "ON":
-            mode_nuit_status = True
-        elif data["state"] == "OFF":
-            mode_nuit_status = False
 
     handlers = {
         # status handlers

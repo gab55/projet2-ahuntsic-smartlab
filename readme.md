@@ -96,6 +96,7 @@ L'object du project est de créer un système de gestion automatique de la maiso
     * demander l'état de chaque led (mode nuit, ou par défaut seulement état donne la led-17)
     * demander l'état de la temperature cpu
   * les commandes peuvent fonctionner par voix ou par dashboard
+    * la commande "allumer la lampe" envoie une commande mqtt pour allumer la led-17 la meme que celle de une switch mqtt dashboard
 
 par example: 
 
@@ -234,7 +235,14 @@ le mqtt dash
 
 ![Screenshot_20260327-115437.png](preuves/Screenshot_20260327-115437.png)
 
+hotword active et le retour vocal et laisse donner une commande
+![Screenshot 2026-04-12 at 22.24.07.png](preuves/Screenshot%202026-04-12%20at%2022.24.07.png)
 
+un exemple de commande avec logging et envoie mqtt
+![Screenshot 2026-04-12 at 22.27.23.png](preuves/Screenshot%202026-04-12%20at%2022.27.23.png)
+
+recoie de commandes vocales
+![Screenshot 2026-04-12 at 22.24.07.png](preuves/Screenshot%202026-04-12%20at%2022.24.07.png)
 
 ## Vérifier MariaDB
 
