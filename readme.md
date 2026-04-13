@@ -230,21 +230,23 @@ Une fois le publisher est active
 Le suscriber reçoit les messages auxquels il est souscrit
 ![Screenshot 2026-03-27 at 15.14.49](https://hackmd.io/_uploads/r1KVvINiWg.png)
 
+le mqtt dash
+
+![Screenshot_20260327-115437.png](preuves/Screenshot_20260327-115437.png)
 
 
 
 ## Vérifier MariaDB
 
 example de requetes de base pour verifier les deux tables
-![Screenshot 2026-03-27 at 13.29.26](https://hackmd.io/_uploads/B1VaPI4sWx.png)
+![Screenshot 2026-03-27 at 13.29.26.png](preuves/Screenshot%202026-03-27%20at%2013.29.26.png)
 
-![Screenshot 2026-03-27 at 15.18.34](https://hackmd.io/_uploads/ryvMuIEoZe.png)
-
+![Screenshot 2026-03-27 at 13.29.26.png](preuves/Screenshot%202026-03-27%20at%2013.29.26.png)
 
 celle ci montre le moyenne de temperature pour chaque heure de chaque jour
 
 ![Screenshot 2026-03-27 at 13.26.30](https://hackmd.io/_uploads/SJGydUVobx.png)
 
-
-
+les retours table events avec vox
+![Screenshot 2026-04-12 at 21.54.22.png](preuves/Screenshot%202026-04-12%20at%2021.54.22.png)
 
