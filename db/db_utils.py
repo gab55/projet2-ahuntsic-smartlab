@@ -3,17 +3,11 @@ from datetime import datetime, timezone
 from json import JSONDecodeError
 
 import pymysql
-import yaml
 import os
 from src.client_utils import parse_json
-
-# with open('config.yaml', 'r') as file:
-#     config = yaml.load(file, Loader=yaml.FullLoader)
-
-
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import src.client_utils as client_utils
 import main_utils
+
 config = main_utils.get_config()
 
 test = config['test']

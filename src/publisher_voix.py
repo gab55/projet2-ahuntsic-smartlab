@@ -21,8 +21,14 @@ from db import db_utils
 
 led_state = "La lampe est éteint"
 mode_nuit_state = "La mode nuit est désactivé"
+msg_led_on = "La lampe est allume"
+msg_led_off = "La lampe est éteint"
+msg_mode_nuit_on = "La mode nuit est actif"
+msg_mode_nuit_off = "La mode nuit est désactivé"
 config = main_utils.get_config()
 MIC_INDEX = 1
+
+
 
 rec_liste = {
     "oui": ["./aiff/aff.aiff"],#"Oui"
@@ -43,7 +49,7 @@ def cached_lemmantizer(word):
     return lemmatizer.lemmatize(word)
 
 # Speech Recognition
-lemmatizer = FrenchLefffLemmatizer()
+lemmatizer = FrenchLefffLemmatizer() # plus specialise au francais que les outills de nltk
 regex_pattern = re.compile(r"[^\W\d_]+", flags=re.UNICODE)
 mic = None
 r = None
@@ -133,14 +139,13 @@ def categorise_command(tokens: list):
     if any(item in tokens for item in ["etat", "etats", "status", "statut"]):
         if any(item in tokens for item in ["mode", "nuit"]):
             global mode_nuit_state
-            respond("none", text=f"mode nuit est {'actif' if mode_nuit_state else 'inactif'}")
-            log_event(config["device_id"], f"Vox", f"demande status mode nuit: {'actif' if mode_nuit_state else 'inactif'}", config["TOPICS"]["vox"])
+            respond("none", text=mode_nuit_state)
+            log_event(config["device_id"], f"Vox", f"demande status mode nuit: {mode_nuit_state}", config["TOPICS"]["vox"])
             return None, None
         else:
             global led_state
-            respond("none", f"la lampe est {'on' if led_state else 'off'}")
-            db_utils.insert_event(f"{led_state}", topic="demande état lampe")
-            log_event(config["device_id"], f"Vox", f"demande status lampe: {'on' if led_state else 'off'}", config["TOPICS"]["vox"])
+            respond("none", led_state)
+            log_event(config["device_id"], f"Vox", f"demande status lampe: {led_state}", config["TOPICS"]["vox"])
 
             return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
@@ -161,12 +166,19 @@ def categorise_command(tokens: list):
 
     # Objects
     if any(item in tokens for item in ["mode", "nuit"]):
+        global mode_nuit_state, msg_mode_nuit_on, msg_mode_nuit_off
         if cmd == "ON":
-            respond("nuit_on")
-            print("mode nuit on")
+            if mode_nuit_state == msg_mode_nuit_off:
+                respond("nuit_on")
+                print("mode nuit on")
+            else:
+                respond("none", text=mode_nuit_state)
         elif cmd == "OFF":
-            respond("nuit_off")
-            print("mode nuit off")
+            if mode_nuit_state == msg_mode_nuit_on:
+                respond("nuit_off")
+                print("mode nuit off")
+            else:
+                respond("none", text=mode_nuit_state)
 
         log_event(config["device_id"], f"Vox", f"cmd mode nuit: {cmd}",
                   config["TOPICS"]["vox"])
@@ -182,12 +194,19 @@ def categorise_command(tokens: list):
         return config["TOPICS"]["led_cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
+        global led_state, msg_led_on, msg_led_off
         if cmd == "ON":
-            respond("on")
-            print("allume la lampe")
+            if led_state == msg_led_off:
+                respond("on")
+                print("allume la lampe")
+            else:
+                respond("none", text=led_state)
         elif cmd == "OFF":
-            respond("off")
-            print("eteint la lampe")
+            if led_state == msg_led_on:
+                respond("off")
+                print("éteint la lampe")
+            else:
+                respond("none", text=led_state)
 
         log_event(config["device_id"], f"Vox", f"demande toggle lampe: {cmd}",
                   config["TOPICS"]["vox"])
@@ -219,7 +238,6 @@ def speak(text, lang="fr", speed=150):
             subprocess.run(["espeak-ng", "-v", lang, "-s", str(speed), text], check=True)
         except FileNotFoundError:
             print("espeak-ng not found, using say instead")
-
 
 # tts functions
 def play(file):
@@ -302,22 +320,26 @@ def on_message(client, userdata, msg):
         db_utils.insert_event(payload, topic=config["TOPICS"]["other"])
 
 def handle_led_status(client, data, payload):
+    global led_state
     if (data["state"]).strip().upper() == "ON":
-        led_state = "La lampe est allume"
+        global msg_led_on
+        led_state = msg_led_on
     elif (data["state"]).strip().upper() == "OFF":
-        led_state = "La lampe est fermée"
+        global msg_led_off
+        led_state = msg_led_off
     else:
         led_state = "Le statut de la lampe est inconnue"
-    # db_utils.insert_event(payload, topic=config["TOPICS"]["led_status"])
 
 def handle_mode_nuit_status(client, data, payload):
+    global mode_nuit_state
     if (data["state"]).strip().upper() == "ON":
-        mode_nuit_state = "La mode nuit est actif"
+        global msg_mode_nuit_on
+        mode_nuit_state = msg_mode_nuit_on
     elif (data["state"]).strip().upper() == "OFF":
-        mode_nuit_state = "La mode nuit est désactivé"
+        global msg_mode_nuit_off
+        mode_nuit_state = msg_mode_nuit_off
     else:
         mode_nuit_state = "Le statut de la mode nuit est inconnu"
-    # db_utils.insert_event(payload, topic=config["TOPICS"]["mode_nuit_status"])
 
 client.on_connect = on_connect
 client.on_disconnect = client_utils.on_disconnect

@@ -52,7 +52,7 @@ result.wait_for_publish()
 try:
 
     while True:
-        temperature_c = cpu_temp()
+        temperature_c = round(cpu_temp())
         db_utils.db_conn()
         payload = {
             "device": config["device_id"],
