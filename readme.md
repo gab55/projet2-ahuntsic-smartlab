@@ -7,6 +7,9 @@ title: 'Projet 1 : Ahuntisc SmartLab - Gab et Charles'
 
 # Table des matières
 * [Diagramme d'architecture](#diagramme-darchitecture)
+* [Materiels](#materiels)
+* [Dependances](#dependances)
+* [Features](#features)
 * [Conventions de topics](#conventions-de-topics)
 * [Exemples JSON](#exemples-json)
 * [Procédure d'installation/exécution](#procédure-dinstallationexécution)
@@ -225,6 +228,7 @@ Ou démarrer les clients séparément avec
 
 ## Test avec Mosquitto pub/sub
 
+### Partie 1 : MQTT
 Une fois le publisher est active
 ![Screenshot 2026-03-27 at 15.14.34](https://hackmd.io/_uploads/H1V8D8Vj-e.png)
 
@@ -235,21 +239,27 @@ le mqtt dash
 
 ![Screenshot_20260327-115437.png](preuves/Screenshot_20260327-115437.png)
 
+
+### Partie 2 : Voix
 hotword active et le retour vocal et laisse donner une commande
 ![Screenshot 2026-04-12 at 22.24.07.png](preuves/Screenshot%202026-04-12%20at%2022.24.07.png)
 
 un exemple de commande avec logging et envoie mqtt
 ![Screenshot 2026-04-12 at 22.27.23.png](preuves/Screenshot%202026-04-12%20at%2022.27.23.png)
 
-recoie de commandes vocales
+Un example de recoie de commandes vocales
 ![Screenshot 2026-04-12 at 22.24.07.png](preuves/Screenshot%202026-04-12%20at%2022.24.07.png)
 
 tokens vocaux Recognition de commandes vocales "active mode nuit" et 
-joue la réponse vocale, envoie mqtt topic et confirmation de changement d'etat
+donne la réponse vocale, envoie mqtt topic et confirmation de changement d'etat
 ![Screenshot 2026-04-12 at 22.34.17.png](preuves/Screenshot%202026-04-12%20at%2022.34.17.png)
 
-aucune activation hotword sans hotword
+aucune activation hotword sans hotword aucun log pour cette erreur
 ![Screenshot 2026-04-12 at 22.39.24.png](preuves/Screenshot%202026-04-12%20at%2022.39.24.png)
+
+un exemple de non-reconnaissance de commandes vocales donne un message qu'il n'a pas compris et fait un log
+et retourne en mode écoute pour hotword, il pourrait être configuré pour qu'il laisse ressayer de passer une commande
+![Screenshot 2026-04-12 at 22.48.38.png](preuves/Screenshot%202026-04-12%20at%2022.48.38.png)
 
 ## Vérifier MariaDB
 
@@ -259,9 +269,12 @@ example de requetes de base pour verifier les deux tables
 ![Screenshot 2026-03-27 at 13.29.26.png](preuves/Screenshot%202026-03-27%20at%2013.29.26.png)
 
 celle ci montre le moyenne de temperature pour chaque heure de chaque jour
+![Screenshot 2026-03-27 at 13.26.30.png](preuves/Screenshot%202026-03-27%20at%2013.26.30.png)
 
-![Screenshot 2026-03-27 at 13.26.30](https://hackmd.io/_uploads/SJGydUVobx.png)
 
-les retours table events avec vox
+les retours table events avec vox: les demandes de voix ont l'actuator: voix
 ![Screenshot 2026-04-12 at 21.54.22.png](preuves/Screenshot%202026-04-12%20at%2021.54.22.png)
+
+retours table events avec erreur
+![Screenshot 2026-04-12 at 22.54.48.png](preuves/Screenshot%202026-04-12%20at%2022.54.48.png)
 
