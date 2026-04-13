@@ -158,7 +158,7 @@ def categorise_command(tokens: list):
     # states
     if any(item in tokens for item in ["allumer", "on", "activer", "active", "allume"]):
         cmd = "ON"
-    elif any(item in tokens for item in ["desactiver", "off", "eteint", "eteins", "etein"]):
+    elif any(item in tokens for item in ["desactiver", "off", "eteint", "eteins", "etein", "ferme"]):
         cmd = "OFF"
     else:
         cmd = "error"
