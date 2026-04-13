@@ -20,11 +20,11 @@ import main_utils
 from db import db_utils
 
 led_state = "La lampe est éteint"
-mode_nuit_state = "La mode nuit est désactivé"
+mode_nuit_state = "La mode nuit n'est pas actif"
 msg_led_on = "La lampe est allume"
 msg_led_off = "La lampe est éteint"
 msg_mode_nuit_on = "La mode nuit est actif"
-msg_mode_nuit_off = "La mode nuit est désactivé"
+msg_mode_nuit_off = "La mode nuit n'est pas actif"
 config = main_utils.get_config()
 MIC_INDEX = 1
 
