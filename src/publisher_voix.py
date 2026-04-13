@@ -133,20 +133,19 @@ def log_event(device, actuator, state, topic):
     db_utils.insert_event(json.dumps(payload), topic=topic)
 
 def categorise_command(tokens: list):
+    """categorize a vox command"""
+    global mode_nuit_state, led_state
     if not tokens:
         return None
     # status commands
     if any(item in tokens for item in ["etat", "etats", "status", "statut"]):
         if any(item in tokens for item in ["mode", "nuit"]):
-            global mode_nuit_state
             respond("none", text=mode_nuit_state)
             log_event(config["device_id"], f"Vox", f"demande status mode nuit: {mode_nuit_state}", config["TOPICS"]["vox"])
             return None, None
         else:
-            global led_state
             respond("none", led_state)
             log_event(config["device_id"], f"Vox", f"demande status lampe: {led_state}", config["TOPICS"]["vox"])
-
             return None, None
     if any(item in tokens for item in ["temperature", "cpu"]):
         temp = round(gpio.cpu_temp())
@@ -166,7 +165,6 @@ def categorise_command(tokens: list):
 
     # Objects
     if any(item in tokens for item in ["mode", "nuit"]):
-        global mode_nuit_state, msg_mode_nuit_on, msg_mode_nuit_off
         if cmd == "ON":
             if mode_nuit_state == msg_mode_nuit_off:
                 respond("nuit_on")
@@ -194,7 +192,6 @@ def categorise_command(tokens: list):
         return config["TOPICS"]["led_cling"], cmd
 
     if any(item in tokens for item in ["lumiere", "lampe", "del", "led"]):
-        global led_state, msg_led_on, msg_led_off
         if cmd == "ON":
             if led_state == msg_led_off:
                 respond("on")
