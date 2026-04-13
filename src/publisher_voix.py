@@ -319,10 +319,8 @@ def on_message(client, userdata, msg):
 def handle_led_status(client, data, payload):
     global led_state
     if (data["state"]).strip().upper() == "ON":
-        global msg_led_on
         led_state = msg_led_on
     elif (data["state"]).strip().upper() == "OFF":
-        global msg_led_off
         led_state = msg_led_off
     else:
         led_state = "Le statut de la lampe est inconnue"
@@ -330,10 +328,8 @@ def handle_led_status(client, data, payload):
 def handle_mode_nuit_status(client, data, payload):
     global mode_nuit_state
     if (data["state"]).strip().upper() == "ON":
-        global msg_mode_nuit_on
         mode_nuit_state = msg_mode_nuit_on
     elif (data["state"]).strip().upper() == "OFF":
-        global msg_mode_nuit_off
         mode_nuit_state = msg_mode_nuit_off
     else:
         mode_nuit_state = "Le statut de la mode nuit est inconnu"
