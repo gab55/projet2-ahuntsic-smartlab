@@ -219,7 +219,7 @@ def wait_for_command():
     if text is None:
         return None, None
     tokens = voix_normalise(text)
-    print(f"tokens: {tokens}")
+    print(f"tokens: {tokens} text: {text}")
     return categorise_command(tokens)
 
 system_name = platform.system().lower()

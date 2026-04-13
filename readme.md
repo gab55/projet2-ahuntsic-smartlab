@@ -244,6 +244,13 @@ un exemple de commande avec logging et envoie mqtt
 recoie de commandes vocales
 ![Screenshot 2026-04-12 at 22.24.07.png](preuves/Screenshot%202026-04-12%20at%2022.24.07.png)
 
+tokens vocaux Recognition de commandes vocales "active mode nuit" et 
+joue la réponse vocale, envoie mqtt topic et confirmation de changement d'etat
+![Screenshot 2026-04-12 at 22.34.17.png](preuves/Screenshot%202026-04-12%20at%2022.34.17.png)
+
+aucune activation hotword sans hotword
+![Screenshot 2026-04-12 at 22.39.24.png](preuves/Screenshot%202026-04-12%20at%2022.39.24.png)
+
 ## Vérifier MariaDB
 
 example de requetes de base pour verifier les deux tables
