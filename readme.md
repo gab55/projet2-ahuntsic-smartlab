@@ -89,7 +89,7 @@ L'object du project est de créer un système de gestion automatique de la maiso
 * Vox
   * les hot words acceptee sont : "Bonjour", "Maison"
   * les commandes de object sont: "état", "etats", "status", "statut", "mode", "nuit", "temperature", "cpu", "lumiere", "lampe", "del", "led"
-  * les commandes de state: "allumer", "on", "activer", "active", "allume", "desactiver", "off", "eteint", "eteins", "etein"
+  * les commandes de state: "allumer", "on", "activer", "active", "allume", "desactiver", "off", "eteint", "eteins", "etein", "cligne", "clignote", "scintille"
   * les actions sont : 
     * allumer/eteindre/clignoter la led-17 blanche, 
     * allumer/eteindre la led-22 qui symbolise le mode nuit.

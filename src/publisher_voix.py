@@ -182,7 +182,7 @@ def categorise_command(tokens: list):
                   config["TOPICS"]["vox"])
         return config["TOPICS"]["mode_nuit"], cmd
 
-    if "clignote" in tokens:
+    if any(item in tokens for item in ["cligne", "clignote", "scintille"]):
         if cmd == "ON" or cmd == "OFF": #pour pouvoir toggle pour le moment
             respond("cling")
             print("clignote")
